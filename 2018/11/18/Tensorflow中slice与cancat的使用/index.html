@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="两个函数都是卷积神经网络中的常见操作，再修改tf.conrib.slim 程序时，slim 没有自带的slice操作，但是可以直接使用tf的slice操作代替。12345678t = tf.constant([[[1, 1, 1], [2, 2, 2]],                 [[3, 3, 3], [4, 4, 4]],                 [[5, 5, 5], [6,">
+<meta name="keywords" content="python,深度学习,tensorflow">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tensorflow中slice与cancat的使用">
+<meta property="og:url" content="https://zkeenly.github.io/2018/11/18/Tensorflow中slice与cancat的使用/index.html">
+<meta property="og:site_name" content="Keen&#39;s blog">
+<meta property="og:description" content="两个函数都是卷积神经网络中的常见操作，再修改tf.conrib.slim 程序时，slim 没有自带的slice操作，但是可以直接使用tf的slice操作代替。12345678t = tf.constant([[[1, 1, 1], [2, 2, 2]],                 [[3, 3, 3], [4, 4, 4]],                 [[5, 5, 5], [6,">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/48109926-656cf500-e284-11e8-8eee-341ec66cb880.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/48110019-db715c00-e284-11e8-84e3-4eae81c7b618.png">
+<meta property="og:updated_time" content="2018-11-18T06:27:24.403Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tensorflow中slice与cancat的使用">
+<meta name="twitter:description" content="两个函数都是卷积神经网络中的常见操作，再修改tf.conrib.slim 程序时，slim 没有自带的slice操作，但是可以直接使用tf的slice操作代替。12345678t = tf.constant([[[1, 1, 1], [2, 2, 2]],                 [[3, 3, 3], [4, 4, 4]],                 [[5, 5, 5], [6,">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/6647857/48109926-656cf500-e284-11e8-8eee-341ec66cb880.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Keen's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://zkeenly.github.io/2018/11/18/Tensorflow中slice与cancat的使用/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Tensorflow中slice与cancat的使用 | Keen's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Keen's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zkeenly.github.io/2018/11/18/Tensorflow中slice与cancat的使用/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Keen">
+      <meta itemprop="description" content="大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Keen's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tensorflow中slice与cancat的使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-11-18 14:20:13 / Modified: 14:27:24" itemprop="dateCreated datePublished" datetime="2018-11-18T14:20:13+08:00">2018-11-18</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/深度学习/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/11/18/Tensorflow中slice与cancat的使用/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count valine-comment-count" data-xid="/2018/11/18/Tensorflow中slice与cancat的使用/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>两个函数都是卷积神经网络中的常见操作，<br>再修改tf.conrib.slim 程序时，slim 没有自带的slice操作，但是可以直接使用tf的slice操作代替。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">t = tf.constant([[[1, 1, 1], [2, 2, 2]],</span><br><span class="line">                 [[3, 3, 3], [4, 4, 4]],</span><br><span class="line">                 [[5, 5, 5], [6, 6, 6]]])</span><br><span class="line">tf.slice(t, [1, 0, 0], [1, 1, 3])  # [[[3, 3, 3]]]</span><br><span class="line">tf.slice(t, [1, 0, 0], [1, 2, 3])  # [[[3, 3, 3],</span><br><span class="line">                                   #   [4, 4, 4]]]</span><br><span class="line">tf.slice(t, [1, 0, 0], [2, 1, 3])  # [[[3, 3, 3]],</span><br><span class="line">                                   #  [[5, 5, 5]]]</span><br></pre></td></tr></table></figure></p>
+<p>其中后两个参数为 begin和 size。<br>begin 代表开始位置（每一个维度上从第几个元素开始截取）<br>size 代表每一个维度从begin位置上开始截取多少个元素</p>
+<p>简单的说：<br>例子：<br><code>tf.slice(t, [1, 0, 0], [1, 1, 3])  # [[[3, 3, 3]]]</code><br>中的[1, 0, 0] ：<br>第一个1 代表从行 [[3, 3, 3], [4, 4, 4]] 开始截取。<br>第二个0 代表从[3, 3, 3] 开始截取<br>第三个0 代表从元素3 开始截取<br>中的[1, 1, 3] ：<br>第一个1 代表截取一个元素即[[3, 3, 3], [4, 4, 4]]<br>第二个1 代表截取一个元素即[3, 3, 3]<br>第三个3 代表截取三个元素即3，3，3<br>最终结果还原原始维度为：[[[3, 3, 3]]]</p>
+<p>例子：<br><code>tf.slice(t, [1, 0, 0], [2, 1, 3])  # [[[3, 3, 3]],  [[5, 5, 5]]]</code><br>中的 [1, 0, 0]：<br>第一个1 代表从行 [[3, 3, 3], [4, 4, 4]] 开始截取。<br>第二个0 代表从[3, 3, 3] 开始截取<br>第三个0 代表从元素3 开始截取<br>中的 [2, 1, 3]：<br>第一个2 代表截取两个元素即<br>                 [[3, 3, 3], [4, 4, 4]],<br>                 [[5, 5, 5], [6, 6, 6]]<br>可以视为:<br>x = [3, 3, 3], [4, 4, 4]<br>y = [5, 5, 5], [6, 6, 6]<br>截取了[x,y]<br>第二个1代表上面的每一行(每一个元素x or y)截取一个子元素即<br>                 [[3, 3, 3]],<br>                 [[5, 5, 5]]<br>这里的每个单元素整体是：<br>x = [3, 3, 3]<br>y = [5, 5, 5]<br>第三个3 代表上面的每一个元素截取三个子元素即<br>3, 3, 3<br>5, 5, 5<br>最终结果还原原始维度为：<br>[[[3, 3, 3]],[[5, 5, 5]]]</p>
+<p>在程序中如果没有确定的维度大小，可以用-1代表终止位置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">conv1 = slim.conv2d(input, 32, [3, 3], rate=1, activation_fn=lrelu, scope=&apos;g_conv1_1&apos;)</span><br><span class="line">conv1 = slim.conv2d(conv1, 32, [3, 3], rate=1, activation_fn=lrelu, scope=&apos;g_conv1_2&apos;)</span><br><span class="line">slice_1 = tf.slice(conv1, [0, 0, 0, 0], [-1, -1, -1, 16])</span><br><span class="line">slice_2 = tf.slice(conv1, [0, 0, 0, 16], [-1, -1, -1, 16])</span><br></pre></td></tr></table></figure></p>
+<p><img width="385" alt="image" src="https://user-images.githubusercontent.com/6647857/48109926-656cf500-e284-11e8-8eee-341ec66cb880.png"></p>
+<p>concat 的用法就比较简单了，但是要注意坐标的设置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">t1 = [[1, 2, 3], [4, 5, 6]]</span><br><span class="line">t2 = [[7, 8, 9], [10, 11, 12]]</span><br><span class="line">tf.concat([t1, t2], 0)  # [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]</span><br><span class="line">tf.concat([t1, t2], 1)  # [[1, 2, 3, 7, 8, 9], [4, 5, 6, 10, 11, 12]]</span><br></pre></td></tr></table></figure></p>
+<p>其中第二个参数0 代表以第1维合并，1代表第二维合并…</p>
+<p><code>concat1 = tf.concat([slice_1, slice_2], axis=3)</code><br>例如上面的slice_1 与slice_2 的合并需要设置axis=3.<br><img width="364" alt="image" src="https://user-images.githubusercontent.com/6647857/48110019-db715c00-e284-11e8-84e3-4eae81c7b618.png"></p>
+<p>引用：<br><a href="https://www.tensorflow.org/api_docs/python/tf/slice" target="_blank" rel="noopener">https://www.tensorflow.org/api_docs/python/tf/slice</a><br><a href="https://www.tensorflow.org/api_docs/python/tf/concat" target="_blank" rel="noopener">https://www.tensorflow.org/api_docs/python/tf/concat</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+            <a href="/tags/深度学习/" rel="tag"># 深度学习</a>
+          
+            <a href="/tags/tensorflow/" rel="tag"># tensorflow</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/18/CNN中的参数量与占用内存计算/" rel="next" title="CNN中的参数量与占用内存计算">
+                <i class="fa fa-chevron-left"></i> CNN中的参数量与占用内存计算
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/18/BayerRaw与RGB的转换/" rel="prev" title="BayerRaw与RGB的转换">
+                BayerRaw与RGB的转换 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/avatar.jpg" alt="Keen">
+            
+              <p class="site-author-name" itemprop="name">Keen</p>
+              <p class="site-description motion-element" itemprop="description">大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/zkeenly" title="GitHub &rarr; https://github.com/zkeenly" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" title="QQ &rarr; tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>QQ</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://www.douban.com/people/mggige/" title="DouBan &rarr; https://www.douban.com/people/mggige/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>DouBan</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhangkaixu321@163.com" title="Email &rarr; mailto:zhangkaixu321@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>Email</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Keen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'SkWT2NNHPIBHPvGC3XIpFRUk-gzGzoHsz',
+        appKey: 'tiTu7SX6GOrlxzeyWyKVGtNG',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: false
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

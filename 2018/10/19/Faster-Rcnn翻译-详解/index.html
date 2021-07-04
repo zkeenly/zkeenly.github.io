@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Faster RCNN我们将本文的目标检测系统称之为Faster Rcnn。其中包含两个部分，第一部分是深度全卷积网络模型来提取候选区域，第二个是Fast Rcnn识别模型。整个系统是统一的目标识别网络。如图所示，我们采用最近流行的术语“注意力”机制，使用RPN模型用来指引Fast Rcnn模型应该“看”哪里。在3.1中我们将介绍RPN网络的详细设计。在3.2中我们将设计算法使用特征共享的方式对两">
+<meta name="keywords" content="目标检测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Faster-Rcnn翻译+详解">
+<meta property="og:url" content="https://zkeenly.github.io/2018/10/19/Faster-Rcnn翻译-详解/index.html">
+<meta property="og:site_name" content="Keen&#39;s blog">
+<meta property="og:description" content="Faster RCNN我们将本文的目标检测系统称之为Faster Rcnn。其中包含两个部分，第一部分是深度全卷积网络模型来提取候选区域，第二个是Fast Rcnn识别模型。整个系统是统一的目标识别网络。如图所示，我们采用最近流行的术语“注意力”机制，使用RPN模型用来指引Fast Rcnn模型应该“看”哪里。在3.1中我们将介绍RPN网络的详细设计。在3.2中我们将设计算法使用特征共享的方式对两">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://www.zkeenly.com/images/2019-03-19/1552960089165.png">
+<meta property="og:image" content="https://www.zkeenly.com/images/2019-03-19/1552960114278.png">
+<meta property="og:image" content="https://www.zkeenly.com/images/2019-03-19/1552960150332.png">
+<meta property="og:image" content="https://www.zkeenly.com/images/2019-03-19/1552960224187.png">
+<meta property="og:image" content="https://www.zkeenly.com/images/2019-03-19/1552987177356.png">
+<meta property="og:image" content="https://www.zkeenly.com/images/2019-03-19/1552987990659.png">
+<meta property="og:image" content="https://www.zkeenly.com/images/2019-03-19/1553472595147.png">
+<meta property="og:image" content="https://www.zkeenly.com/images/2019-03-19/1553479914604.png">
+<meta property="og:updated_time" content="2021-07-04T10:17:28.753Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Faster-Rcnn翻译+详解">
+<meta name="twitter:description" content="Faster RCNN我们将本文的目标检测系统称之为Faster Rcnn。其中包含两个部分，第一部分是深度全卷积网络模型来提取候选区域，第二个是Fast Rcnn识别模型。整个系统是统一的目标识别网络。如图所示，我们采用最近流行的术语“注意力”机制，使用RPN模型用来指引Fast Rcnn模型应该“看”哪里。在3.1中我们将介绍RPN网络的详细设计。在3.2中我们将设计算法使用特征共享的方式对两">
+<meta name="twitter:image" content="https://www.zkeenly.com/images/2019-03-19/1552960089165.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Keen's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://zkeenly.github.io/2018/10/19/Faster-Rcnn翻译-详解/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Faster-Rcnn翻译+详解 | Keen's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Keen's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zkeenly.github.io/2018/10/19/Faster-Rcnn翻译-详解/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Keen">
+      <meta itemprop="description" content="大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Keen's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Faster-Rcnn翻译+详解
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-10-19 20:04:15" itemprop="dateCreated datePublished" datetime="2018-10-19T20:04:15+08:00">2018-10-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2021-07-04 18:17:28" itemprop="dateModified" datetime="2021-07-04T18:17:28+08:00">2021-07-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/深度学习/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/10/19/Faster-Rcnn翻译-详解/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count valine-comment-count" data-xid="/2018/10/19/Faster-Rcnn翻译-详解/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Faster-RCNN"><a href="#Faster-RCNN" class="headerlink" title="Faster RCNN"></a>Faster RCNN</h2><p>我们将本文的目标检测系统称之为Faster Rcnn。其中包含两个部分，第一部分是深度全卷积网络模型来提取候选区域，第二个是Fast Rcnn识别模型。整个系统是统一的目标识别网络。如图所示，我们采用最近流行的术语“注意力”机制，使用RPN模型用来指引Fast Rcnn模型应该“看”哪里。在3.1中我们将介绍RPN网络的详细设计。在3.2中我们将设计算法使用特征共享的方式对两个模型训练。</p>
+<p><img src="https://www.zkeenly.com/images/2019-03-19/1552960089165.png" alt="1552960089165"></p>
+<h3 id="3-1-区域选择网络（RPN）"><a href="#3-1-区域选择网络（RPN）" class="headerlink" title="3.1 区域选择网络（RPN）"></a>3.1 区域选择网络（RPN）</h3><p>​    RPN采用任意大小的图像作为输入，输出一个目标矩阵框集合，每一个目标矩阵都包含对象的分数。我们采用全卷积网络完成处理，在这一章将详细描述。由于我们最终需要与Fast Rcnn 对比，我们采取与fast rcnn 使用一样的卷积层。我们采用ZF和VGG16测试。ZF包含5个可共享的卷积层，VGG16包含12个可共享的卷积层。</p>
+<p>​    为了生成区域选择框，我们采用一个小的网络在最后输出的卷积特征图上滑动，这个小网络采用3*3的卷积层滑动。每一个滑动窗口都映射到题为特征中（ZF的256d，VGG16的512d，之后跟随Relu）。这个特征传送到两个同级全连接层（box-regression layer 以及 box-classification layer）。这个小网络如图3所示（左侧），</p>
+<p><img src="https://www.zkeenly.com/images/2019-03-19/1552960114278.png" alt="1552960114278"></p>
+<h4 id="3-1-1-Anchors"><a href="#3-1-1-Anchors" class="headerlink" title="3.1.1 Anchors"></a>3.1.1 Anchors</h4><p>在每一个滑动窗口的位置，我们同时预测多个区域候选，每个位置最多包含K个anchor boxes（通过每个位置扩展出不同形状的候选框），然后cls包含2k个输出结果，用来估计每个候选框是不是可能的目标对象。reg包含4k个输出结果用来保存每个候选框的坐标位置。ancher在滑动窗口的中心位置，并且由三个放大率和三个方向调节，每个滑动窗口中心点会生成9个ancher，这个输出的卷积特征图中一共输出大概2400个候选区域（每个候选区域都由两个scores 和四个coordinates）。</p>
+<h5 id="平移不变Anchors"><a href="#平移不变Anchors" class="headerlink" title="平移不变Anchors"></a>平移不变Anchors</h5><p>我们的方法一个最重要的属性是平移不变性，我们的方法保证了关于anchors 和计算相关区域到anchors的函数的平移不变性。平移不变性由全卷积网络的性质得到。相对的，在MultiBox方法中，使用k-means产生800个anchors ，是没有办法保证平移不变性的，所以MultiBox无法保证相同的区域在经过并以变换后仍然可以识别。</p>
+<blockquote>
+<p> 大概是说，卷积网络相对k-means更容易保持平移不变性</p>
+</blockquote>
+<p>平移不变性同时降低了模型的大小，MultiBox由（4+1）<em> 800维度全连接输出层，然而我们的方法仅有（4+2）</em> 9维度的卷积输出层，在k=9anchors的时候。我们的输出层包含2.9 <em> 10^4个参数（VGG16的512</em> （4+2）<em> 9），而MultiBox‘s的输出包含6.1</em> 10^6参数（googlenet1536<em> （4+ 1）</em>  800）。如果考虑后面特征映射层，我们的方法相对MultiBox会少多个量级的参数，同时我们认为我们的方法将会具有更小的过拟合风险。</p>
+<h5 id="Multi-Scale-Anchors-as-Regression-References"><a href="#Multi-Scale-Anchors-as-Regression-References" class="headerlink" title="Multi-Scale Anchors as Regression References"></a>Multi-Scale Anchors as Regression References</h5><p>我们设计一个新的anchors的多尺度提取方法（多方向比例），如图所示，目前由两个主流的方法来进行多尺度预测。第一种方法是基于图像/特征金字塔（DPM，CNN方法）。图像将多尺度统一大小，然后经过特征提取（HOG,深度卷积），分别计算每一个尺度。这种方式往往时间开销很大。第二种方法是通过使用多适度的滑动窗口，不同尺度使用不同的滤波大小来训练（例如5<em> 7，7</em> 5）。如果使用这种方法解决多尺度问题，这可以称为滤波金字塔模型。通常两种方法联合采用。</p>
+<p><img src="https://www.zkeenly.com/images/2019-03-19/1552960150332.png" alt="1552960150332"></p>
+<p>​    相应的，我们的anchor是用过建立一个更高效的“anchor金字塔”方法。我们的分类和多尺度回归边框的方法仅仅依赖于但尺度的图像和特征度，并且使用单尺度的滤波。我们采用这种有效地措施来解决多尺度和大小问题，由表中可以看出。</p>
+<p>​    由于多尺度设计是基于anchors 的，我们可以完全使用卷积层来计算单尺度图像。这个多尺度anchors是一个解决多尺度问题而不增加更多开销的关键部分。</p>
+<h4 id="3-1-2-损失函数"><a href="#3-1-2-损失函数" class="headerlink" title="3.1.2 损失函数"></a>3.1.2 损失函数</h4><p>为了训练RPN，我们为每一个anchor赋值二分类标签。我们赋值正样本标签给两种anchors：1，这个anchor/cnchors 是一个最高的intersection-over-union（iou），基准box重叠率。2，一个anchor的重叠率高于0.7其他基准box。每个基准box可能会赋值给多个anchors正标签。通常第二种是足够决定正样本了；但是我们仍然采用第一种情况，由于在少量情况第二种也许不能找到正样本。如果Iou率是少于0.3的，我们为所有基准box的非正anchor赋值负标签。如果anchors 不是正的也不是负的，那对训练目标没有帮助。</p>
+<p>我们在训练Fast Rcnn最小化目标函数通过多任务损失函数。我们图像的损失函数定义为：</p>
+<p><img src="https://www.zkeenly.com/images/2019-03-19/1552960224187.png" alt="1552960224187"></p>
+<ul>
+<li>i 是这个anchor在mini-batch 的索引，</li>
+<li>p<sub>i</sub>是anchor i 是一个目标的概率。</li>
+<li>如果anchor是正样本，基准标签p<sub>i</sub><sup>* </sup>是1。负样本则是0。</li>
+<li>t<sub>i</sub>是一个向量，代表4个坐标的参数。来预测bounding box。</li>
+<li>t<sub>i</sub><sup> * </sup> 是相应的基准正样本标签。</li>
+<li>类别损失L<sub>cls</sub> 是两个类别的log损失函数。</li>
+<li>回归损失我们使用L<sub>reg</sub> (t<sub>i</sub>, t<sub>i</sub> <sup><em> </em></sup> ) = R(t<sub>i</sub> -  t<sub>i</sub><sup>   </sup>  )</li>
+<li>R是[2] 中定义的robust损失函数（smooth L<sub>1</sub>）。</li>
+<li>p<sub>i</sub> <sup><em> </em></sup> L<sub>reg</sub> 意味着回归损失仅仅当正样本（p<sub>i</sub> <sup> </sup> =1）的时候被激活，放负样本（p<sub>i</sub> <sup>* </sup> =0）的时候激活。</li>
+<li>输出层cls 和reg 分别包含{p<sub>i</sub> }和{t<sub>i</sub>}。</li>
+</ul>
+<p>这两部分由N<sub>cls</sub> 和N<sub>reg</sub> 以及平衡参数的权重 \lambda 标准化。在我们当前的实现方法中，cls列表在公式（1）中是被mini-batch size标准化的。reg 由anchor 位置的数量标准化的。我们默认设置 \lambda =10，并且使cls 和reg 具有大概相等的权重。我们通过实现设置不同的lambda 值得到不同的结果。所以标准化是不需要过于强调，而应该尽量简化。</p>
+<p><img src="https://www.zkeenly.com/images/2019-03-19/1552987177356.png" alt="1552987177356"></p>
+<p>​    对于边框回归，我们采用四个坐标的参数化:</p>
+<p><img src="https://www.zkeenly.com/images/2019-03-19/1552987990659.png" alt="1552987990659"></p>
+<p>其中，x,y,w以及h决定这个box的中心坐标以及宽和高。变量 x, x<sub>a</sub> ,以及x<sup>* </sup> 分别是预测box， anchorbox，以及基准box。这样可以使anchor box 通过bounding-box回归到附近的基准box。</p>
+<p>​    此外，我们的方法bounding-box 回归方法不同于其他Roi等方法，bounding-box 回归可以得到任意的Roi大小，回归权重可以与所有大小的范围共享。在我们的公式中，用于回归的特征提取在特征图上使用了相同的卷积大小（3* 3）。为了得到不同的大小，我们设置学习k个回归框。每一个回归是代表一个尺度和方向改变率，并且k回归不能共享权重。同样的，得益于anchors 的设计，它也是可以通过修复尺度和大小来预测不同大小的。</p>
+<h3 id="3-1-3-训练-RPNS"><a href="#3-1-3-训练-RPNS" class="headerlink" title="3.1.3 训练 RPNS"></a>3.1.3 训练 RPNS</h3><p>​    RPN可以通过反向传播以及梯度下降训练端到端网络。我们“image-centric”策略来训练网络。每次从单一图像包含正负样例的anchors mini-batch 。为所有anchor损失函数优化是可能的，但是这将会偏向于负样本，因为负样本是多数的。相反，我们随机256个anchors 样本在图像中计算mini-batch损失函数，在这里正负样本比例为1：1。如果少于128个正样本，那么我们使用负样本填充mini-batch。</p>
+<p>​    我们通过高斯标准分布0.01，随机初始化所有层的权重。其他（共享权重的）使用预处理模型初始化来作为标准。我们使用学习率为0.001 在60K个minibatchs上，学习率为0.0001在生于20K个mini-batchs上，我们采用动量优化参数为0.9，权重衰退为0.0005，采用caffe实现。</p>
+<h2 id="3-2-RPN与Fast-Rcnn的特征共享"><a href="#3-2-RPN与Fast-Rcnn的特征共享" class="headerlink" title="3.2 RPN与Fast Rcnn的特征共享"></a>3.2 RPN与Fast Rcnn的特征共享</h2><p>现在，我们将要描述如何训练区域范围生成网络，不考虑利用这些范围的基于区域的目标识别CNN。对于检测网络，我们采用 Fast Rcnn。接下来我们描述将RPN和FastRcnn一体化的算法，并且共享卷积层，如图2.</p>
+<p>将RPN和Fast Rcnn 训练单独训练将会以不同的方式修改卷积层。我们因此需要一种技术来允许共享共享两个网络的卷积层。我们以三种特征共享的方式训练网络：</p>
+<p>（i）Alternating training，这种解决方法，我们首先训练RPN，并且使用目标区域来训练 Fast Rcnn，这个网络通过Fast Rcnn 来微调经过初始化过的RPN，并且这个方法是可迭代的。这是在本文所有实验中采用的一种方法。</p>
+<p>（ii）Approximate joint training（近似联合训练）. 这种方法，RPN和Fast Rcnn 网络被融合在一个网络中，像图2中训练的。在每次SGD迭代中，正向传播中的区域生成参数被固定，当训练Fast Rcnn检测器的时候预先计算区域建议框。反向传播和往常相同，共享层的反向传播信号中RPN和Fast Rcnn的loss相结合。这个方案是容易实现的。但是这个方法忽视了衍生的候选盒子坐标 w.r.t.，这个坐标也是网络的回应，所以是近似的。在我们的实验中，我们的经验中发现这个解决方案产生了相近的结果，但是降低了25%的计算时间。这个方案在哦我们提供的Python 代码中。</p>
+<p>（iii）Non-approximate joint training. 根据以上讨论，这个通过RPN的边框预测也是一个输入函数。在Fast Rcnn的RoI 池化层 接受这个卷积特征并且预测边框作为一个输入，因此，一个理论上有效的反向传播求解器也应该包含梯度w.r.t。上述近似联合训练忽略了这些梯度。在非近似联合训练解中，我们需要一个RoI池层，它是可导的w.r.t.坐标。这是一个非常重要的问题，可以通过[15]中开发的“RoI池化”层给出解决方案，这超出了本文的讨论范围。</p>
+<p><strong>四步交替训练</strong> 。在这个文中，我们采用实用的四步训练算法来通过交替优化学习共享特征。在第一步，我们如3.1.3训练RPN。这个网络由ImageNet 预训练模型初始化，并且微调这个端到端的区域选择任务。在第二步骤，我们通过Fast Rcnn使用第一步骤区域生成的RPN，训练一个可分离的检测网络。这个检测网络也有ImageNet预训练模型来训练。在这一点，两个网络不能够共享卷积层。第三步骤，我们使用检测网络初始化RPN训练模型，然后固定共享的卷积层，并且只微调RPN层。现在这两个网络共享了卷积层。最终保持这个共享卷积层固定，然后微调FastRcnn的网络层。如此，两个网络合并为统一网络并共享相同的卷积层。一个相似的交替训练方法可以运行多次，但是我们看到之后的改善并不明显。</p>
+<h2 id="3-3-实现细节"><a href="#3-3-实现细节" class="headerlink" title="3.3 实现细节"></a>3.3 实现细节</h2><p>我们训练和测试 单尺度图像上的区域选择和对象检测网络[1] [2]。我们统一调整尺寸为短边600 像素[2]。多尺度特征提取（使用image pyramid）也许会改善精度但是不能有一个好的速度以及准确速度的权衡[2]。在重新调整图像尺度，在最后一个卷积层上，ZF 和VGG网络总步幅都是16像素。并且因此，在调整大小之前，典型的pascal网络具有大概10个像素。尽管如此，大尺度的步幅仍会有一个好的结果，尽管小的尺度可能会有更好的精度。</p>
+<p>对于anchors，我们采用3个尺度，128<sup>2</sup> ,256<sup>2</sup> , 512<sup>2</sup> 。以及三个方向调整 1：1，1：2，2：1.这些这些超参数没有根据特别的数据集进行选择，我们下一章有具体实验结果。在我们的讨论中，我们的方法不需要图像金字塔或者滤波器金字塔来预测多个尺度的区域，从而节省了运行时间。图3右侧显示了我们对于多个尺度的预测效果。表1显示了学习到的每一个anchor平均区域大小。我们的算法允许比潜在感知区域更大范围的预测。这样的预测并不是不可能的-如果一个物体的中心是可见的，那么可以大概的估计出物体的范围。</p>
+<p><img src="https://www.zkeenly.com/images/2019-03-19/1553472595147.png" alt="1553472595147"></p>
+<p>穿过图像边界的anchor boxes需要谨慎处理，在训练的时候，我们忽视所有越过边界的anchors，它们对loss没有帮助。对于典型的1000<em> 600图像，一共大概会有20000个（60</em> 40 * 9）个anchor 。随着边界anchors被忽略，大概每张图片一共有6000个anchors用于训练，如果这个越过边界的anchors 不被忽略，则会在目标函数中引入大的，难以纠正的误差项，且训练不会收敛。但在测试过程中，我们仍然将全卷积RPN应用于整张图像。这可能会产生跨边界的提议边界框，我们剪切到图像边界。</p>
+<p>​    一些RPN提议互相之间高度重叠。为了减少冗余，我们在提议区域根据他们的<em>cls</em>分数采取非极大值抑制（NMS）。我们将NMS的IoU阈值固定为0.7，这就给每张图像留下了大约2000个提议区域。正如我们将要展示的那样，NMS不会损害最终的检测准确性，但会大大减少提议的数量。在NMS之后，我们使用前N个提议区域来进行检测。接下来，我们使用2000个RPN提议对Fast R-CNN进行训练，但在测试时评估不同数量的提议。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>简单的说，整个流程为</p>
+<p><img src="https://www.zkeenly.com/images/2019-03-19/1553479914604.png" alt="1553479914604"></p>
+<p>input-特征提取-RPN生成候选区域-RoI统一大小-Fast Rcnn预测目标分类</p>
+<ol>
+<li><p>假设原图为720<em>1280，resize为600 </em> 1067</p>
+</li>
+<li><p>input图像经过conv5_3 特征提取生成1 <em> 38 </em> 67 * 1024。的特征图。</p>
+</li>
+<li><p>将38 * 67 的特征图传送到RPN中，进行预测是前景还是背景。</p>
+<ol>
+<li>RPN网络具体为采用3<em> 3的滤波器以stride=1 滑动特征图。每次滑动为一个anchor，然后这个anchor扩展为9个不同方向和大小的anchor。一共得到38 </em> 67 * 9个原始图片proposal。</li>
+<li>将剔除越过边界的anchor后剩余部分的anchor 进行预测是前景还是背景，输出cls_score（分类参数），以及bbox_pred（坐标参数）。</li>
+<li>将得到的结果进行非极大抑制，大概留下2000个框作为RPN。</li>
+</ol>
+</li>
+<li>将2000个RPN与特征图相结合，进行RoI Pooling，得到固定尺寸的特征图。送至Fast Rcnn中进行预测。</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/目标检测/" rel="tag"># 目标检测</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/13/数据结构-双散列doublehashing常用方法/" rel="next" title="[数据结构]双散列Doublehashing常用方法">
+                <i class="fa fa-chevron-left"></i> [数据结构]双散列Doublehashing常用方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/10/Mnist识别研究-基于Keras的深度学习基础实例/" rel="prev" title="Mnist识别研究-基于Keras的深度学习基础实例">
+                Mnist识别研究-基于Keras的深度学习基础实例 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/avatar.jpg" alt="Keen">
+            
+              <p class="site-author-name" itemprop="name">Keen</p>
+              <p class="site-description motion-element" itemprop="description">大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/zkeenly" title="GitHub &rarr; https://github.com/zkeenly" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" title="QQ &rarr; tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>QQ</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://www.douban.com/people/mggige/" title="DouBan &rarr; https://www.douban.com/people/mggige/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>DouBan</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhangkaixu321@163.com" title="Email &rarr; mailto:zhangkaixu321@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>Email</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Faster-RCNN"><span class="nav-number">1.</span> <span class="nav-text">Faster RCNN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-区域选择网络（RPN）"><span class="nav-number">1.1.</span> <span class="nav-text">3.1 区域选择网络（RPN）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-Anchors"><span class="nav-number">1.1.1.</span> <span class="nav-text">3.1.1 Anchors</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#平移不变Anchors"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">平移不变Anchors</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Multi-Scale-Anchors-as-Regression-References"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">Multi-Scale Anchors as Regression References</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-损失函数"><span class="nav-number">1.1.2.</span> <span class="nav-text">3.1.2 损失函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-3-训练-RPNS"><span class="nav-number">1.2.</span> <span class="nav-text">3.1.3 训练 RPNS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-RPN与Fast-Rcnn的特征共享"><span class="nav-number">2.</span> <span class="nav-text">3.2 RPN与Fast Rcnn的特征共享</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-实现细节"><span class="nav-number">3.</span> <span class="nav-text">3.3 实现细节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Keen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'SkWT2NNHPIBHPvGC3XIpFRUk-gzGzoHsz',
+        appKey: 'tiTu7SX6GOrlxzeyWyKVGtNG',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: false
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

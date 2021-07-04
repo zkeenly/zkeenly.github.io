@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="作业任务1：熟悉CNN与DNN（训练样本60000，测试10000）利用CNN和DNN完成Mnist识别任务，CNN结构如下所示，DNN结构自定，将效果作为baseline。使用DNN，结构123456Dense(32, input_dim=784),  # 全连接层。32个神经元，输入维度为784（28*28）Activation(&amp;apos;relu&amp;apos;),  # 激活层Dense(1">
+<meta name="keywords" content="mnist">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mnist识别研究-基于Keras的深度学习基础实例">
+<meta property="og:url" content="https://zkeenly.github.io/2018/11/10/Mnist识别研究-基于Keras的深度学习基础实例/index.html">
+<meta property="og:site_name" content="Keen&#39;s blog">
+<meta property="og:description" content="作业任务1：熟悉CNN与DNN（训练样本60000，测试10000）利用CNN和DNN完成Mnist识别任务，CNN结构如下所示，DNN结构自定，将效果作为baseline。使用DNN，结构123456Dense(32, input_dim=784),  # 全连接层。32个神经元，输入维度为784（28*28）Activation(&amp;apos;relu&amp;apos;),  # 激活层Dense(1">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/49086245-06047280-f28f-11e8-9d63-baa68a93f83b.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/49086254-0bfa5380-f28f-11e8-8ac0-f4f1e0b4c1fa.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/49086263-1583bb80-f28f-11e8-967a-e7845810f87c.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/49086300-2a604f00-f28f-11e8-9a40-23b69cdd3daa.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/49086325-3ba95b80-f28f-11e8-8f3d-2d74a293b0ce.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/49086353-49f77780-f28f-11e8-8c57-3863ae06fcff.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/49086372-54b20c80-f28f-11e8-9ae0-4ec6a5aef3f2.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/49086392-5e3b7480-f28f-11e8-9dd6-97bc7dd920d3.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/49086412-698ea000-f28f-11e8-971e-ccfc984ae287.png">
+<meta property="og:updated_time" content="2018-11-28T01:30:39.549Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mnist识别研究-基于Keras的深度学习基础实例">
+<meta name="twitter:description" content="作业任务1：熟悉CNN与DNN（训练样本60000，测试10000）利用CNN和DNN完成Mnist识别任务，CNN结构如下所示，DNN结构自定，将效果作为baseline。使用DNN，结构123456Dense(32, input_dim=784),  # 全连接层。32个神经元，输入维度为784（28*28）Activation(&amp;apos;relu&amp;apos;),  # 激活层Dense(1">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/6647857/49086245-06047280-f28f-11e8-9d63-baa68a93f83b.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Keen's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://zkeenly.github.io/2018/11/10/Mnist识别研究-基于Keras的深度学习基础实例/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Mnist识别研究-基于Keras的深度学习基础实例 | Keen's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Keen's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zkeenly.github.io/2018/11/10/Mnist识别研究-基于Keras的深度学习基础实例/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Keen">
+      <meta itemprop="description" content="大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Keen's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Mnist识别研究-基于Keras的深度学习基础实例
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-11-10 22:09:06" itemprop="dateCreated datePublished" datetime="2018-11-10T22:09:06+08:00">2018-11-10</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-11-28 09:30:39" itemprop="dateModified" datetime="2018-11-28T09:30:39+08:00">2018-11-28</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/深度学习/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/11/10/Mnist识别研究-基于Keras的深度学习基础实例/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count valine-comment-count" data-xid="/2018/11/10/Mnist识别研究-基于Keras的深度学习基础实例/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="作业任务1：熟悉CNN与DNN（训练样本60000，测试10000）"><a href="#作业任务1：熟悉CNN与DNN（训练样本60000，测试10000）" class="headerlink" title="作业任务1：熟悉CNN与DNN（训练样本60000，测试10000）"></a>作业任务1：熟悉CNN与DNN（训练样本60000，测试10000）</h2><h3 id="利用CNN和DNN完成Mnist识别任务，CNN结构如下所示，DNN结构自定，将效果作为baseline。"><a href="#利用CNN和DNN完成Mnist识别任务，CNN结构如下所示，DNN结构自定，将效果作为baseline。" class="headerlink" title="利用CNN和DNN完成Mnist识别任务，CNN结构如下所示，DNN结构自定，将效果作为baseline。"></a>利用CNN和DNN完成Mnist识别任务，CNN结构如下所示，DNN结构自定，将效果作为baseline。</h3><h4 id="使用DNN，结构"><a href="#使用DNN，结构" class="headerlink" title="使用DNN，结构"></a>使用DNN，结构</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Dense(32, input_dim=784),  # 全连接层。32个神经元，输入维度为784（28*28）</span><br><span class="line">Activation(&apos;relu&apos;),  # 激活层</span><br><span class="line">Dense(10),  # 全连接层，10个神经元</span><br><span class="line">Activation(&apos;softmax&apos;)  # 激活层</span><br><span class="line">nb_epoch=1, batch_size=32</span><br><span class="line">model.fit(X_train, y_train, nb_epoch=1, batch_size=32)</span><br></pre></td></tr></table></figure>
+<p>两次效果：</p>
+<blockquote>
+<p>test loss: 0.21429610718488692<br>test accuracy:  0.9395<br>test loss: 0.21414068414568901<br>test accuracy:  0.9399</p>
+</blockquote>
+<h4 id="使用CNN结构"><a href="#使用CNN结构" class="headerlink" title="使用CNN结构"></a>使用CNN结构</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">conv_1 = Conv2D(32, kernel_size=(3, 3), activation=&apos;relu&apos;, input_shape=input_shape)</span><br><span class="line">conv_2 = Conv2D(64, (3, 3), activation=&apos;relu&apos;)</span><br><span class="line">model = Sequential()</span><br><span class="line">model.add(conv_1)</span><br><span class="line">model.add(conv_2)</span><br><span class="line">model.add(MaxPooling2D(pool_size=(2, 2)))</span><br><span class="line">model.add(Dropout(0.25))</span><br><span class="line">model.add(Flatten())</span><br><span class="line">model.add(Dense(128, activation=&apos;relu&apos;))</span><br><span class="line">model.add(Dropout(0.5))</span><br><span class="line">model.add(Dense(num_classes, activation=&apos;softmax&apos;))</span><br><span class="line">batch_size = 128</span><br><span class="line">num_classes = 10</span><br><span class="line">epochs = 1</span><br><span class="line">model.fit(x_train, y_train,</span><br><span class="line">          batch_size=batch_size,</span><br><span class="line">          epochs=epochs,</span><br><span class="line">          verbose=1, validation_data=(x_test, y_test))</span><br></pre></td></tr></table></figure>
+<p>两次效果：</p>
+<blockquote>
+<p>Test loss: 0.06023046794650145<br>Test accuracy: 0.9816<br>Test loss: 0.06867549542314373<br>Test accuracy: 0.9775</p>
+</blockquote>
+<blockquote>
+<p>结论：在同样的epoch下，cnn效果更好，时间更长。Dnn只要10s CNN需要5min</p>
+</blockquote>
+<h3 id="显示CNN的第一层（卷积层），第二层（激励层）的输出图片-输出其中9张"><a href="#显示CNN的第一层（卷积层），第二层（激励层）的输出图片-输出其中9张" class="headerlink" title="显示CNN的第一层（卷积层），第二层（激励层）的输出图片(输出其中9张)"></a>显示CNN的第一层（卷积层），第二层（激励层）的输出图片(输出其中9张)</h3><center><img src="https://user-images.githubusercontent.com/6647857/49086245-06047280-f28f-11e8-9d63-baa68a93f83b.png" alt="image"></center><br><center><img src="https://user-images.githubusercontent.com/6647857/49086254-0bfa5380-f28f-11e8-8ac0-f4f1e0b4c1fa.png" alt="image"></center>
+
+<h3 id="Mnist中的每个图片做subsampling（研究两种方式，随机采样和抛弃一半），分别利用CNN和DNN在新样本集合作训练，考察subsampling对实验效果的影响（训练误差，测试误差，训练速度），考虑如何减小subsampling的影响。"><a href="#Mnist中的每个图片做subsampling（研究两种方式，随机采样和抛弃一半），分别利用CNN和DNN在新样本集合作训练，考察subsampling对实验效果的影响（训练误差，测试误差，训练速度），考虑如何减小subsampling的影响。" class="headerlink" title="Mnist中的每个图片做subsampling（研究两种方式，随机采样和抛弃一半），分别利用CNN和DNN在新样本集合作训练，考察subsampling对实验效果的影响（训练误差，测试误差，训练速度），考虑如何减小subsampling的影响。"></a>Mnist中的每个图片做subsampling（研究两种方式，随机采样和抛弃一半），分别利用CNN和DNN在新样本集合作训练，考察subsampling对实验效果的影响（训练误差，测试误差，训练速度），考虑如何减小subsampling的影响。</h3><h4 id="四倍降采样之后的结果："><a href="#四倍降采样之后的结果：" class="headerlink" title="四倍降采样之后的结果："></a>四倍降采样之后的结果：</h4><center><img src="https://user-images.githubusercontent.com/6647857/49086263-1583bb80-f28f-11e8-967a-e7845810f87c.png" alt="image"></center>
+
+<blockquote>
+<p>CNN：<br>运行时间：从5min变为为50s。<br>两次效果：<br>Test loss: 0.08262749407133088<br>Test accuracy: 0.9757<br>Test loss: 0.07995445217452943<br>Test accuracy: 0.9744<br>结论：测试误差不大。<br>DNN:<br>训练时间约为5s<br>test loss: 0.2969126805961132<br>test accuracy:  0.9169<br>结论：误差相对仍较大。</p>
+</blockquote>
+<h4 id="设置抛弃一半之后的效果："><a href="#设置抛弃一半之后的效果：" class="headerlink" title="设置抛弃一半之后的效果："></a>设置抛弃一半之后的效果：</h4><center><img src="https://user-images.githubusercontent.com/6647857/49086300-2a604f00-f28f-11e8-9a40-23b69cdd3daa.png" alt="image"></center>
+
+<blockquote>
+<p>CNN:<br>运行时间在2min左右。<br>两次测试效果：<br>Test loss: 0.19521159455776216<br>Test accuracy: 0.9417<br>Test loss: 0.1949758700400591<br>Test accuracy: 0.9389<br>结论：测试误差进一步增大，但是仍保持较高的准确率。<br>DNN：<br>训练时间约为5s<br>test loss: 0.39655784153938295<br>test accuracy:  0.8881<br>结论：误差相对CNN更大。</p>
+</blockquote>
+<h4 id="取原训练集前10-的样本做训练，测试集不变，考察CNN和DNN效果，考虑如何减小小样本集的影响。"><a href="#取原训练集前10-的样本做训练，测试集不变，考察CNN和DNN效果，考虑如何减小小样本集的影响。" class="headerlink" title="取原训练集前10%的样本做训练，测试集不变，考察CNN和DNN效果，考虑如何减小小样本集的影响。"></a>取原训练集前10%的样本做训练，测试集不变，考察CNN和DNN效果，考虑如何减小小样本集的影响。</h4><blockquote>
+<p>CNN：<br>两次运行结果：<br>Test loss: 0.29531892013549804<br>Test accuracy: 0.9097<br>Test loss: 0.3230072082400322<br>Test accuracy: 0.9173<br>DNN：<br>两次运行结果：<br>test loss: 0.4636564645767212<br>test accuracy:  0.8762<br>test loss: 0.46389272186756136<br>test accuracy:  0.8767<br>通过调整nb_epoch=10，增加训练次数可优化测试结果：<br>test loss: 0.27507588347643613<br>test accuracy:  0.9222<br>继续增大epoch 将对结果影响不大（修改nb_epoch=100）：<br>test loss: 0.62979790314195<br>test accuracy:  0.9262</p>
+</blockquote>
+<h4 id="尝试对DNN增加池化层和Dropout层，考察DNN效果变化。"><a href="#尝试对DNN增加池化层和Dropout层，考察DNN效果变化。" class="headerlink" title="尝试对DNN增加池化层和Dropout层，考察DNN效果变化。"></a>尝试对DNN增加池化层和Dropout层，考察DNN效果变化。</h4><blockquote>
+<p>无pooling层可对DNN池化（维度不一致）。<br>添加dropout(0.55):<br>test loss: 0.3060034876406193<br>test accuracy:  0.9186<br>添加dropout(0.80):<br>test loss: 0.5026416866779327<br>test accuracy:  0.8948<br>添加dropout(0.99):<br>test loss: 2.2277009323120116<br>test accuracy:  0.2207<br>结论：保持一定比例的dropout不会对结果产生太大影响，速度会有所提升。但是接近1时，将无法识别数据。</p>
+</blockquote>
+<h4 id="对kernel-size进行调整（一起调整，或者逐层调整），考察CNN效果变化。思考如何选择kernel-size"><a href="#对kernel-size进行调整（一起调整，或者逐层调整），考察CNN效果变化。思考如何选择kernel-size" class="headerlink" title="对kernel_size进行调整（一起调整，或者逐层调整），考察CNN效果变化。思考如何选择kernel_size"></a>对kernel_size进行调整（一起调整，或者逐层调整），考察CNN效果变化。思考如何选择kernel_size</h4><blockquote>
+<p>修改kernel_size =conv1 (5,5),conv2(3,3):<br>Test loss: 0.04961018333421089<br>Test accuracy: 0.9844<br>结论：影响不大。准确率略有提高。<br>修改kernel_size=conv1(2,2),conv2(8,8):<br>Test loss: 0.04970626147154253<br>Test accuracy: 0.9824<br>结论：时间消耗为15min，效果无显著提升。可适当提升第一层卷积核，有助于提高识别率。</p>
+</blockquote>
+<h2 id="作业任务2：研究如何“欺骗”DNN和CNN"><a href="#作业任务2：研究如何“欺骗”DNN和CNN" class="headerlink" title="作业任务2：研究如何“欺骗”DNN和CNN"></a>作业任务2：研究如何“欺骗”DNN和CNN</h2><h3 id="输出DNN和CNN认为最像“8”的图片"><a href="#输出DNN和CNN认为最像“8”的图片" class="headerlink" title="输出DNN和CNN认为最像“8”的图片"></a>输出DNN和CNN认为最像“8”的图片</h3><blockquote>
+<p>DNN（most likely eight）：<br>可能性: 0.9992219位置 5003</p>
+</blockquote>
+ <center><img src="https://user-images.githubusercontent.com/6647857/49086325-3ba95b80-f28f-11e8-8f3d-2d74a293b0ce.png" alt="image"></center>
+
+<blockquote>
+<p>CNN（most likely eight）:<br>可能性: 0.99999833位置 7114</p>
+</blockquote>
+ <center><img src="https://user-images.githubusercontent.com/6647857/49086353-49f77780-f28f-11e8-8c57-3863ae06fcff.png" alt="image"></center>
+
+<h3 id="在真实“8”图片上加入噪声，让DNN与CNN认为它是“9”"><a href="#在真实“8”图片上加入噪声，让DNN与CNN认为它是“9”" class="headerlink" title="在真实“8”图片上加入噪声，让DNN与CNN认为它是“9”"></a>在真实“8”图片上加入噪声，让DNN与CNN认为它是“9”</h3><blockquote>
+<p>DNN fake9:</p>
+</blockquote>
+<center><img src="https://user-images.githubusercontent.com/6647857/49086372-54b20c80-f28f-11e8-9ae0-4ec6a5aef3f2.png" alt="image"></center>
+
+<blockquote>
+<p>预测值的概率：<br>[[4.0106301e-07 1.8723180e-05 2.6028445e-05 4.2457259e-04 2.4138275e-04 2.7176596e-03 1.5008907e-06 3.7194110e-02 4.5580325e-01 5.0357234e-01]]<br>最可能的值： 9<br>CNN fake9:</p>
+</blockquote>
+ <center><img src="https://user-images.githubusercontent.com/6647857/49086392-5e3b7480-f28f-11e8-9dd6-97bc7dd920d3.png" alt="image"></center>
+
+<blockquote>
+<p>预测值的概率:<br> [[0. 0. 0. 0. 0. 0. 0. 0. 0. 1.]]<br>最可能的值：<br>结论：若使用DNN的fake9样例，仍可识别为8</p>
+</blockquote>
+ <center><img src="https://user-images.githubusercontent.com/6647857/49086412-698ea000-f28f-11e8-971e-ccfc984ae287.png" alt="image"></center>
+
+<blockquote>
+<p>预测值的概率:<br>[[0. 0. 0. 0. 0. 0. 0. 0. 1. 0.]]<br>最可能的值： 8</p>
+</blockquote>
+<p>code：<a href="https://github.com/zkeenly/mnist_base_dl" target="_blank" rel="noopener">点击这里</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mnist/" rel="tag"># mnist</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/19/Faster-Rcnn翻译-详解/" rel="next" title="Faster-Rcnn翻译+详解">
+                <i class="fa fa-chevron-left"></i> Faster-Rcnn翻译+详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/15/生活记录-武汉大学口腔医院治疗经历（根管治疗-拔牙-种植牙）/" rel="prev" title="【生活记录】武汉大学口腔医院经历（根管治疗/拔牙/种植牙）">
+                【生活记录】武汉大学口腔医院经历（根管治疗/拔牙/种植牙） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/avatar.jpg" alt="Keen">
+            
+              <p class="site-author-name" itemprop="name">Keen</p>
+              <p class="site-description motion-element" itemprop="description">大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/zkeenly" title="GitHub &rarr; https://github.com/zkeenly" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" title="QQ &rarr; tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>QQ</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://www.douban.com/people/mggige/" title="DouBan &rarr; https://www.douban.com/people/mggige/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>DouBan</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhangkaixu321@163.com" title="Email &rarr; mailto:zhangkaixu321@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>Email</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#作业任务1：熟悉CNN与DNN（训练样本60000，测试10000）"><span class="nav-number">1.</span> <span class="nav-text">作业任务1：熟悉CNN与DNN（训练样本60000，测试10000）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#利用CNN和DNN完成Mnist识别任务，CNN结构如下所示，DNN结构自定，将效果作为baseline。"><span class="nav-number">1.1.</span> <span class="nav-text">利用CNN和DNN完成Mnist识别任务，CNN结构如下所示，DNN结构自定，将效果作为baseline。</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用DNN，结构"><span class="nav-number">1.1.1.</span> <span class="nav-text">使用DNN，结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用CNN结构"><span class="nav-number">1.1.2.</span> <span class="nav-text">使用CNN结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显示CNN的第一层（卷积层），第二层（激励层）的输出图片-输出其中9张"><span class="nav-number">1.2.</span> <span class="nav-text">显示CNN的第一层（卷积层），第二层（激励层）的输出图片(输出其中9张)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mnist中的每个图片做subsampling（研究两种方式，随机采样和抛弃一半），分别利用CNN和DNN在新样本集合作训练，考察subsampling对实验效果的影响（训练误差，测试误差，训练速度），考虑如何减小subsampling的影响。"><span class="nav-number">1.3.</span> <span class="nav-text">Mnist中的每个图片做subsampling（研究两种方式，随机采样和抛弃一半），分别利用CNN和DNN在新样本集合作训练，考察subsampling对实验效果的影响（训练误差，测试误差，训练速度），考虑如何减小subsampling的影响。</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#四倍降采样之后的结果："><span class="nav-number">1.3.1.</span> <span class="nav-text">四倍降采样之后的结果：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置抛弃一半之后的效果："><span class="nav-number">1.3.2.</span> <span class="nav-text">设置抛弃一半之后的效果：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#取原训练集前10-的样本做训练，测试集不变，考察CNN和DNN效果，考虑如何减小小样本集的影响。"><span class="nav-number">1.3.3.</span> <span class="nav-text">取原训练集前10%的样本做训练，测试集不变，考察CNN和DNN效果，考虑如何减小小样本集的影响。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#尝试对DNN增加池化层和Dropout层，考察DNN效果变化。"><span class="nav-number">1.3.4.</span> <span class="nav-text">尝试对DNN增加池化层和Dropout层，考察DNN效果变化。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对kernel-size进行调整（一起调整，或者逐层调整），考察CNN效果变化。思考如何选择kernel-size"><span class="nav-number">1.3.5.</span> <span class="nav-text">对kernel_size进行调整（一起调整，或者逐层调整），考察CNN效果变化。思考如何选择kernel_size</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#作业任务2：研究如何“欺骗”DNN和CNN"><span class="nav-number">2.</span> <span class="nav-text">作业任务2：研究如何“欺骗”DNN和CNN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#输出DNN和CNN认为最像“8”的图片"><span class="nav-number">2.1.</span> <span class="nav-text">输出DNN和CNN认为最像“8”的图片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在真实“8”图片上加入噪声，让DNN与CNN认为它是“9”"><span class="nav-number">2.2.</span> <span class="nav-text">在真实“8”图片上加入噪声，让DNN与CNN认为它是“9”</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Keen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'SkWT2NNHPIBHPvGC3XIpFRUk-gzGzoHsz',
+        appKey: 'tiTu7SX6GOrlxzeyWyKVGtNG',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: false
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

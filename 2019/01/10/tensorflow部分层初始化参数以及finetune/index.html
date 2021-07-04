@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="本文在 tensorflow+slim 中实现基于原始卷积网络扩展增加新的层，然后finetune新的网络层参数。 1，锁定部分变量（网络层），只finetune另一部分变量(网络层)首先重置默认图,防止出现意外错误 1tf.reset_default_graph()  # 重置默认图。 定义网络操作pipeline,其中network为使用slim-api定义的一些列卷积操作 12345in_i">
+<meta name="keywords" content="tensorflow,slim">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tensorflow部分层初始化参数以及finetune">
+<meta property="og:url" content="https://zkeenly.github.io/2019/01/10/tensorflow部分层初始化参数以及finetune/index.html">
+<meta property="og:site_name" content="Keen&#39;s blog">
+<meta property="og:description" content="本文在 tensorflow+slim 中实现基于原始卷积网络扩展增加新的层，然后finetune新的网络层参数。 1，锁定部分变量（网络层），只finetune另一部分变量(网络层)首先重置默认图,防止出现意外错误 1tf.reset_default_graph()  # 重置默认图。 定义网络操作pipeline,其中network为使用slim-api定义的一些列卷积操作 12345in_i">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-01-17T08:12:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tensorflow部分层初始化参数以及finetune">
+<meta name="twitter:description" content="本文在 tensorflow+slim 中实现基于原始卷积网络扩展增加新的层，然后finetune新的网络层参数。 1，锁定部分变量（网络层），只finetune另一部分变量(网络层)首先重置默认图,防止出现意外错误 1tf.reset_default_graph()  # 重置默认图。 定义网络操作pipeline,其中network为使用slim-api定义的一些列卷积操作 12345in_i">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Keen's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://zkeenly.github.io/2019/01/10/tensorflow部分层初始化参数以及finetune/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Tensorflow部分层初始化参数以及finetune | Keen's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Keen's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zkeenly.github.io/2019/01/10/tensorflow部分层初始化参数以及finetune/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Keen">
+      <meta itemprop="description" content="大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Keen's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tensorflow部分层初始化参数以及finetune
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-01-10 17:59:00" itemprop="dateCreated datePublished" datetime="2019-01-10T17:59:00+08:00">2019-01-10</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-01-17 16:12:54" itemprop="dateModified" datetime="2019-01-17T16:12:54+08:00">2019-01-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/深度学习/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/01/10/tensorflow部分层初始化参数以及finetune/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count valine-comment-count" data-xid="/2019/01/10/tensorflow部分层初始化参数以及finetune/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文在 tensorflow+slim 中实现基于原始卷积网络扩展增加新的层，然后finetune新的网络层参数。</p>
+<h3 id="1，锁定部分变量（网络层），只finetune另一部分变量-网络层"><a href="#1，锁定部分变量（网络层），只finetune另一部分变量-网络层" class="headerlink" title="1，锁定部分变量（网络层），只finetune另一部分变量(网络层)"></a>1，锁定部分变量（网络层），只finetune另一部分变量(网络层)</h3><p>首先重置默认图,防止出现意外错误</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tf.reset_default_graph()  <span class="comment"># 重置默认图。</span></span><br></pre></td></tr></table></figure>
+<p>定义网络操作pipeline,其中network为使用slim-api定义的一些列卷积操作</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">in_image = tf.placeholder(tf.float32, [<span class="keyword">None</span>, <span class="keyword">None</span>, <span class="keyword">None</span>, <span class="number">4</span>])</span><br><span class="line">gt_image = tf.placeholder(tf.float32, [<span class="keyword">None</span>, <span class="keyword">None</span>, <span class="keyword">None</span>, <span class="number">3</span>])</span><br><span class="line">out_image = network(in_image)  <span class="comment"># 定义pipeline</span></span><br><span class="line">G_loss = tf.reduce_mean(tf.abs(out_image - gt_image))  <span class="comment"># 定义损失函数</span></span><br><span class="line">lr = tf.placeholder(tf.float32)  <span class="comment"># 定义学习率</span></span><br></pre></td></tr></table></figure>
+<p>获取所有的网络参数(即定义网络层的scope=””)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">t_vars = tf.trainable_variables()  <span class="comment"># 获取所有的变量</span></span><br></pre></td></tr></table></figure>
+<p>分别获取需要保持不变的变量和需要finetune的变量,scope中包含<code>g_add</code>的为附加finetune层.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">g_vars = [var <span class="keyword">for</span> var <span class="keyword">in</span> t_vars <span class="keyword">if</span> <span class="string">'g_add'</span> <span class="keyword">in</span> var.name]  <span class="comment"># 附加的finetune网络层</span></span><br><span class="line">var_list = [var <span class="keyword">for</span> var <span class="keyword">in</span> t_vars <span class="keyword">if</span> <span class="string">'g_conv'</span> <span class="keyword">in</span> var.name]  <span class="comment"># 不需要改变的网络层</span></span><br></pre></td></tr></table></figure>
+<p>生成train_op,使用<code>var_list=g_vars</code> 设置仅需要finetune的部分</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">G_opt = tf.train.AdamOptimizer(learning_rate=lr).minimize(G_loss, var_list=g_vars)  <span class="comment"># 只训练g_vars部分</span></span><br></pre></td></tr></table></figure>
+<p>以上,其他部分按照正常操作即可以只训练g_vars部分,而不改变vart_list部分</p>
+<h3 id="2，加载部分默认网络层参数-而不改变其他网络层的参数"><a href="#2，加载部分默认网络层参数-而不改变其他网络层的参数" class="headerlink" title="2，加载部分默认网络层参数,而不改变其他网络层的参数"></a>2，加载部分默认网络层参数,而不改变其他网络层的参数</h3><p>首先定义variables_to_restore,其中<code>exclude=[&quot;g_add&quot;]</code> 为不需要恢复的变量,也可以使用<code>include=[&quot;g_conv&quot;]</code> 来定义仅需要恢复的变量.[12] [14]</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">variables_to_restore = slim.get_variables_to_restore(exclude=[<span class="string">"g_add"</span>])  <span class="comment"># 一定要双引号,否则仅exclude 'g_add'一个层.</span></span><br></pre></td></tr></table></figure>
+<p>建立一个re_saver来从已有的模型中恢复g_conv系列参数到网络中.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">re_saver = tf.train.Saver(variables_to_restore)  <span class="comment"># 建立一个saver 用来保存需要恢复的模型变量</span></span><br></pre></td></tr></table></figure></p>
+<p>再建立一个saver,用来训练的时候保存整个模型的ckpt</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">saver = tf.train.Saver()  <span class="comment"># 建立一个模型，用来保存所有的模型变量</span></span><br></pre></td></tr></table></figure>
+<p>将外置模型参数加载到将要训练的模型sess中,并且初始化其余未初始化的参数,训练以及保存模型.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    model_path = <span class="string">'./model.ckpt'</span>  <span class="comment"># 后缀名称仅需要写ckpt即可,后面的00001-00000不必添加</span></span><br><span class="line">    re_saver.restore(sess=sess, save_path=model_path)  <span class="comment"># 恢复模型的参数到新的模型</span></span><br><span class="line">    un_init = tf.variables_initializer(get_uninitialized_variables(sess))  <span class="comment"># 获取没有初始化(通过已有model加载)的变量 </span></span><br><span class="line">    sess.run(un_init)  <span class="comment"># 对没有初始化的变量进行初始化并训练.</span></span><br><span class="line">    <span class="keyword">for</span> epoch <span class="keyword">in</span> range(lastepoch, <span class="number">4001</span>):</span><br><span class="line">    	_, G_current, output = sess.run([G_opt, G_loss, out_image],</span><br><span class="line">                                        feed_dict=&#123;in_image: input_patch, gt_image: gt_patch, lr: learning_rate&#125;)  <span class="comment"># 执行训练</span></span><br><span class="line">    saver.save(sess, checkpoint_dir + <span class="string">'model.ckpt'</span>)  <span class="comment"># 使用saver.save保存训练模型</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>​    网上查的资料大多大同小异,但是有一点都未曾提及,就是训练中保存变量的时候不应该用恢复网络参数所使用的saver来保存全部的参数.否则将只保存原始加载的那部分参数.而新finetune 的layer将无法保存.导致再测试的时候出现找不到某些层的bug</p>
+<p><code>[TensorFlow: NotFoundError: Key not found in checkpoint]</code></p>
+<p>引用：</p>
+<p>[1] <a href="http://www.tensorfly.cn/tfdoc/how_tos/variables.html" target="_blank" rel="noopener">http://www.tensorfly.cn/tfdoc/how_tos/variables.html</a></p>
+<p>[2] <a href="https://blog.csdn.net/wjc1182511338/article/details/82112181" target="_blank" rel="noopener">https://blog.csdn.net/wjc1182511338/article/details/82112181</a>  获得未初始化的变量</p>
+<p>[3] <a href="https://blog.csdn.net/mr_muli/article/details/80868826" target="_blank" rel="noopener">https://blog.csdn.net/mr_muli/article/details/80868826</a></p>
+<p>[4] <a href="https://blog.csdn.net/ArtistA/article/details/52860050" target="_blank" rel="noopener">https://blog.csdn.net/ArtistA/article/details/52860050</a></p>
+<p>[5] <a href="https://zhuanlan.zhihu.com/p/42183653" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/42183653</a></p>
+<p>[6] <a href="https://www.quora.com/Is-it-possible-to-only-train-the-final-layer-of-a-Neural-Net-in-TensorFlow-that-was-already-trained" target="_blank" rel="noopener">https://www.quora.com/Is-it-possible-to-only-train-the-final-layer-of-a-Neural-Net-in-TensorFlow-that-was-already-trained</a></p>
+<p>[7] <a href="https://stackoverflow.com/questions/37326002/is-it-possible-to-make-a-trainable-variable-not-trainable" target="_blank" rel="noopener">https://stackoverflow.com/questions/37326002/is-it-possible-to-make-a-trainable-variable-not-trainable</a></p>
+<p>[8] <a href="https://stackoverflow.com/questions/45093499/how-to-fine-tune-weights-in-specific-layers-in-tensorflow" target="_blank" rel="noopener">https://stackoverflow.com/questions/45093499/how-to-fine-tune-weights-in-specific-layers-in-tensorflow</a></p>
+<p>[9] <a href="https://stackoverflow.com/questions/34001922/failedpreconditionerror-attempting-to-use-uninitialized-in-tensorflow" target="_blank" rel="noopener">https://stackoverflow.com/questions/34001922/failedpreconditionerror-attempting-to-use-uninitialized-in-tensorflow</a></p>
+<p>[10] <a href="https://stackoverflow.com/questions/47765595/tensorflow-attempting-to-use-uninitialized-value-beta1-power/47780342" target="_blank" rel="noopener">https://stackoverflow.com/questions/47765595/tensorflow-attempting-to-use-uninitialized-value-beta1-power/47780342</a></p>
+<p>[11] <a href="https://blog.csdn.net/u011961856/article/details/76850335" target="_blank" rel="noopener">https://blog.csdn.net/u011961856/article/details/76850335</a></p>
+<p>[12] <a href="https://blog.csdn.net/abc8350712/article/details/78437250" target="_blank" rel="noopener">https://blog.csdn.net/abc8350712/article/details/78437250</a></p>
+<p>[13] <a href="http://mashangxue123.com/TensorFlow/687648778.html" target="_blank" rel="noopener">http://mashangxue123.com/TensorFlow/687648778.html</a></p>
+<p>[14] <a href="https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/slim" target="_blank" rel="noopener">https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/slim</a></p>
+<p>[15] <a href="https://cv-tricks.com/tensorflow-tutorial/save-restore-tensorflow-models-quick-complete-tutorial/?tdsourcetag=s_pctim_aiomsg" target="_blank" rel="noopener">https://cv-tricks.com/tensorflow-tutorial/save-restore-tensorflow-models-quick-complete-tutorial/?tdsourcetag=s_pctim_aiomsg</a></p>
+<p>[16] <a href="https://github.com/cchen156/Learning-to-See-in-the-Dark" target="_blank" rel="noopener">https://github.com/cchen156/Learning-to-See-in-the-Dark</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tensorflow/" rel="tag"># tensorflow</a>
+          
+            <a href="/tags/slim/" rel="tag"># slim</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/10/修改tensorflow张量指定元素值/" rel="next" title="修改Tensorflow张量指定元素值">
+                <i class="fa fa-chevron-left"></i> 修改Tensorflow张量指定元素值
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/15/Latex论文写作/" rel="prev" title="Latex论文写作">
+                Latex论文写作 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/avatar.jpg" alt="Keen">
+            
+              <p class="site-author-name" itemprop="name">Keen</p>
+              <p class="site-description motion-element" itemprop="description">大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/zkeenly" title="GitHub &rarr; https://github.com/zkeenly" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" title="QQ &rarr; tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>QQ</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://www.douban.com/people/mggige/" title="DouBan &rarr; https://www.douban.com/people/mggige/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>DouBan</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhangkaixu321@163.com" title="Email &rarr; mailto:zhangkaixu321@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>Email</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1，锁定部分变量（网络层），只finetune另一部分变量-网络层"><span class="nav-number">1.</span> <span class="nav-text">1，锁定部分变量（网络层），只finetune另一部分变量(网络层)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2，加载部分默认网络层参数-而不改变其他网络层的参数"><span class="nav-number">2.</span> <span class="nav-text">2，加载部分默认网络层参数,而不改变其他网络层的参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Keen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'SkWT2NNHPIBHPvGC3XIpFRUk-gzGzoHsz',
+        appKey: 'tiTu7SX6GOrlxzeyWyKVGtNG',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: false
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

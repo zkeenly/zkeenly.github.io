@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="第一节123456789101112131415161718192021222324252627282930313233343536|dev 设备文件|boot 启动文件|etc 存放系统的配置文件|bin 运行文件|home 用户的住目录--|用户的配置文件|lib 库文件|media 挂在的设备文件|mnt 挂在的分区|sbin var sys 相应的程序文件|root 根用户的主目路：右上角">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RedHat-Linux指令">
+<meta property="og:url" content="https://zkeenly.github.io/2013/05/08/RedHat-Linux指令/index.html">
+<meta property="og:site_name" content="Keen&#39;s blog">
+<meta property="og:description" content="第一节123456789101112131415161718192021222324252627282930313233343536|dev 设备文件|boot 启动文件|etc 存放系统的配置文件|bin 运行文件|home 用户的住目录--|用户的配置文件|lib 库文件|media 挂在的设备文件|mnt 挂在的分区|sbin var sys 相应的程序文件|root 根用户的主目路：右上角">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2021-07-04T10:17:28.755Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RedHat-Linux指令">
+<meta name="twitter:description" content="第一节123456789101112131415161718192021222324252627282930313233343536|dev 设备文件|boot 启动文件|etc 存放系统的配置文件|bin 运行文件|home 用户的住目录--|用户的配置文件|lib 库文件|media 挂在的设备文件|mnt 挂在的分区|sbin var sys 相应的程序文件|root 根用户的主目路：右上角">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Keen's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://zkeenly.github.io/2013/05/08/RedHat-Linux指令/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>RedHat-Linux指令 | Keen's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Keen's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zkeenly.github.io/2013/05/08/RedHat-Linux指令/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Keen">
+      <meta itemprop="description" content="大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Keen's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RedHat-Linux指令
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-05-08 08:33:06" itemprop="dateCreated datePublished" datetime="2013-05-08T08:33:06+08:00">2013-05-08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2021-07-04 18:17:28" itemprop="dateModified" datetime="2021-07-04T18:17:28+08:00">2021-07-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2013/05/08/RedHat-Linux指令/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count valine-comment-count" data-xid="/2013/05/08/RedHat-Linux指令/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="第一节"><a href="#第一节" class="headerlink" title="第一节"></a>第一节</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">|dev 设备文件</span><br><span class="line">|boot 启动文件</span><br><span class="line">|etc 存放系统的配置文件</span><br><span class="line">|bin 运行文件</span><br><span class="line">|home 用户的住目录</span><br><span class="line">--|用户的配置文件</span><br><span class="line">|lib 库文件</span><br><span class="line">|media 挂在的设备文件</span><br><span class="line">|mnt 挂在的分区</span><br><span class="line">|sbin var sys 相应的程序文件</span><br><span class="line">|root 根用户的主目路：右上角有X的打不开</span><br><span class="line">|查看-显示隐藏文件 </span><br><span class="line">|命令：区分大小写</span><br><span class="line">--|vim 编辑文件</span><br><span class="line">--|cat 打开文件</span><br><span class="line">--|ls 列出文件</span><br><span class="line">  --|ls -a 显示全部文件</span><br><span class="line">  --|ls *    :显示所有的文件或者文件夹，但是有.开头的不可以显示出来。</span><br><span class="line">  --|ls .*    :显示以.开头的隐藏文件</span><br><span class="line">  --|ls ？    :匹配单个的任意字符</span><br><span class="line">  --|ls [1-3]</span><br><span class="line">  --|ls /dev/sd[abcd][1-9]    :显示dev下串口分区的有abcd的并且在1-9范围内的</span><br><span class="line">--|cd /usr/l+tab    :自动检索目录下l开头的文件，自动扩展功能</span><br><span class="line">--|yum --help    :生成该命令的帮助</span><br><span class="line">--|man history    :查看该命令帮助手册</span><br><span class="line">--|history     :运行过得命令</span><br><span class="line">  --|history -w his     :将前面使用过得命令保存到当前目录his 文件夹下，</span><br><span class="line">  --|history -c    :清空history文件</span><br><span class="line">  --|history -r    :将保存的history文件重新写入</span><br><span class="line">  --|!32    :调用history文件中的第32条命令</span><br><span class="line">--|clear    :清屏</span><br><span class="line">--|alias    :对命令起别名：显示当前系统中定义过得别名</span><br><span class="line">  --|alias &apos;aa=history&apos;    :对history设置别名为aa:进对本次登录生效：永久生效需要对配置文件修改</span><br><span class="line">|/home/user/.bashc    :对该文件增加别名可以使命令每次重启之后依旧有效</span><br><span class="line">|通配符：</span><br><span class="line">--|yum -i linuxqq.rpm    :RADHAT下安装QQ的方法</span><br></pre></td></tr></table></figure>
+<h2 id="第二节"><a href="#第二节" class="headerlink" title="第二节"></a>第二节</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">创建用户</span><br><span class="line">|--useradd zkx ：创建一个用户zkx</span><br><span class="line">  |--useradd -d /home/张三 zzx :指定主目录的用户账户</span><br><span class="line">  |--useradd -u 602 zxx :指定用户ID的用户账户</span><br><span class="line">  |--useradd -g cuser s4 :指定主组群的用户账户</span><br><span class="line">|--passwd zkx ：用来更改密码</span><br><span class="line">|--系统-&gt;管理-&gt;用户和群组 对用户进行设置：系统建立的用户的ID号都是小于500的</span><br><span class="line">|--定位到--&gt;文件系统--&gt;etc--&gt;passwd文件 ：可以看到自己的用户，项目和项目之间用：隔开</span><br><span class="line">cuser:x:500:500:commonuser:/home/cuser:/bin/bash</span><br><span class="line">s4:x:603:500::/home/s4:/bin/bash</span><br><span class="line">用户名：密码：用户的ID号：用户所属组的组的ID号：用户的描述：用户的主目录：用户登录界面的文件保存位置</span><br><span class="line">|--userdel s4 :删除用户s4：但是删不掉用户里面的文件</span><br><span class="line">  |--userdel -r zxx :连用户的主目录一起删掉</span><br><span class="line">|--groupadd m1 :添加一个用户组群</span><br><span class="line">|exit :exit退出root 身份</span><br><span class="line">|--su zkx :切换到zkx的用户身份</span><br><span class="line">  |--su -c &quot;ls /homex&quot; zkx :执行一条命令使用zkx用户权限（需要提示输入密码）</span><br><span class="line"></span><br><span class="line">chmod 740 /etc/sudoers    为这个文件提供保存文件的权限</span><br><span class="line"></span><br><span class="line">编辑sudoers文件：为一个用户提供某种命令的权限</span><br><span class="line">（使用root身份）</span><br><span class="line">------------------------------</span><br><span class="line">##定义用户的别名</span><br><span class="line">User_Alias S=zkx,cuser</span><br><span class="line">Runas_Alias R=root</span><br><span class="line">Cmdn_Alias USER=/usr/sbin/useradd,/usr/sbin/userdel,/user/bin/passwad</span><br><span class="line">##定义群组的别名</span><br><span class="line">Cmdn_Alias GROP=/uer/sbin/group*</span><br><span class="line">#定义权限</span><br><span class="line">S ALL=(R) NOPASSWD:USER,GROP</span><br><span class="line">----------------------------------</span><br><span class="line"></span><br><span class="line">chmod 440 /etc/sudoers</span><br><span class="line">是配置文件生效</span><br><span class="line"></span><br><span class="line">sudo -l</span><br><span class="line">查看是否已经生效</span><br></pre></td></tr></table></figure>
+<h2 id="第三节"><a href="#第三节" class="headerlink" title="第三节"></a>第三节</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><span class="line">ls  查看文件，显示当前目录下面的内容。不包括以.开头的。（蓝色是文件夹，黑色是文件名字，绿色表示可执行，红色是压缩，浅蓝色是链接文件，灰色表示其他格式的文件，）</span><br><span class="line"></span><br><span class="line">ls -x 按列输出，横向排序，</span><br><span class="line"></span><br><span class="line">ls -c 按列输出，纵向排序。</span><br><span class="line"></span><br><span class="line">ls -F 目录文件后面加上/ ，  * 为可执行文件    ，让文件类型指示符显示出来。</span><br><span class="line"></span><br><span class="line">ls -R 将当前文件夹下面的子目录所有文件都显示出来。</span><br><span class="line"></span><br><span class="line">ls -rl  以列表形式显示详细信息</span><br><span class="line"></span><br><span class="line">一列            二列    三列         四列      五列              六列                         七列</span><br><span class="line"></span><br><span class="line">drwxr-xr-x.     2       root          root       4096          8月 25 2010          yum.repos.d</span><br><span class="line">-rw-r--r--.  1 root root       813  8月 25 2010 yum.conf</span><br><span class="line">drwxr-xr-x.  4 root root      4096  7月 14 2011 yum</span><br><span class="line">-rw-r--r--.  1 root root       585  6月 24 2010 yp.conf</span><br><span class="line">drwxr-xr-x.  2 root root      4096  7月 14 2011 xml</span><br><span class="line"></span><br><span class="line">lrwxrwxrwx. 1 root root           4  5月 22 23:39 root -&gt; sda1</span><br><span class="line">drwxr-xr-x. 2 root root          60  5月 22 23:39 raw</span><br><span class="line">crw-rw-rw-. 1 root root      1,   8  5月 22 23:39 random</span><br><span class="line">brw-rw----. 1 root disk      1,   9  5月 22 23:39 ram9</span><br><span class="line">第一列：：</span><br><span class="line">第一位：文件的性质 </span><br><span class="line"></span><br><span class="line">d：表示文件夹</span><br><span class="line"></span><br><span class="line">c：是一个设备文件，字符型的设备文件</span><br><span class="line"></span><br><span class="line">b：块设备文件，一个块可能是一个扇区或者几个扇区</span><br><span class="line"></span><br><span class="line">l：表示是一个链接文件     --&gt;表示文件链接所指向的是那个文件</span><br><span class="line"></span><br><span class="line">-：表示普通文件</span><br><span class="line"></span><br><span class="line">后三位：rwx </span><br><span class="line"></span><br><span class="line">r：是读取权限</span><br><span class="line"></span><br><span class="line">w：写权限</span><br><span class="line"></span><br><span class="line">x：执行权限</span><br><span class="line"></span><br><span class="line">第一个rwx是文件拥有者</span><br><span class="line"></span><br><span class="line">再后三位：rwx </span><br><span class="line"></span><br><span class="line">属于拥有者用户所在组的用户的权限。</span><br><span class="line"></span><br><span class="line">最后三位：rwx</span><br><span class="line"></span><br><span class="line">对于其他用户的权限。</span><br><span class="line"></span><br><span class="line">第二列：：文件连接树</span><br><span class="line"></span><br><span class="line">第三列：：拥有者</span><br><span class="line"></span><br><span class="line">第四列：：拥有者所在组的其他用户</span><br><span class="line"></span><br><span class="line">第五列：：文件大小</span><br><span class="line"></span><br><span class="line">第六列：：时间</span><br><span class="line"></span><br><span class="line">第七列：：文件名称</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">touch abc 新建一个abc 的文件</span><br><span class="line"></span><br><span class="line">gedit abc 编辑文件</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[cuser@f102 ~]$ file 3     显示文件类型，</span><br><span class="line">3: ASCII text</span><br><span class="line"></span><br><span class="line">[cuser@f102 ~]$ file /dev/sda2</span><br><span class="line">/dev/sda2: block special</span><br><span class="line"></span><br><span class="line">[cuser@f102 ~]$ file -f f      读取f文件中的内容（以列表形式），判断列表里面所有文件的类型（f中内容为1&lt;br&gt;2）</span><br><span class="line">1: ASCII text</span><br><span class="line">2: cannot open `2&apos; (No such file or directory)</span><br><span class="line">:  cannot open `&apos; (No such file or directory)</span><br><span class="line"></span><br><span class="line">[cuser@f102 ~]$ more  -d /etc/termcap       查看长文档的一些命令</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cat 命令查看文档，cat 文件路径名</span><br><span class="line"></span><br><span class="line">cat 建立新文档     cat &gt;s1.txt   用ctrl+d 结束编辑           &gt;是输入重定向</span><br><span class="line"></span><br><span class="line">cat s1.txt s2 &gt;s3      将s1.txt 和s2 链接起来   保存到s3 下面</span><br><span class="line"></span><br><span class="line">[cuser@f102 ~]$ mkdir a1       建立一个文件夹</span><br><span class="line"></span><br><span class="line">[cuser@f102 a1]$ mkdir a1/b1/c1/d1 -p  创建多层的目录</span><br><span class="line"></span><br><span class="line">[cuser@f102 a1]$ rmdir a1/b1/c1/d1 删除这些目录最后的一个文件夹（删除文件夹要确保是空的）</span><br><span class="line"></span><br><span class="line">[cuser@f102 ~]$ rmdir -p a1/a1/b1/c1  删除所有的文件夹。（先删除最后的文件夹，以此向上，如果是空的就删除，不是空的就不删）</span><br><span class="line"></span><br><span class="line">[cuser@f102 ~]$ mv a1 aa1   将a1改为aa1   当第二个参数存在，完成的就是移动。，第二个参数必须是一个目录才可以移动。</span><br><span class="line"></span><br><span class="line">[cuser@f102 ~]$ mv 1 3 aa    将 1 3 都移动到aa 里面</span><br><span class="line"></span><br><span class="line">[cuser@f102 aa]$ mv -bi 2 aa1   - 后面连续两个参数，可以使用。该指令b 表示覆盖文件的时候自动备份，i是在覆盖文件之前有相应的询问。</span><br><span class="line"></span><br><span class="line">[cuser@f102 aa]$ mv -bfS .dak 3 aa1   强制替换文件，不做任何提问。    指令S是要对备份文件制定备份后缀。</span><br><span class="line"></span><br><span class="line">[cuser@f102 aa]$ rm -r aa1    删除aa1并且删除里面的所有文件    指令r是递归的删除一个目录，删除文件也可以使用用，后面的参数必须是一个目录的名字，不可以是文件。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[cuser@f102 aa]$ mkdir  aa1/b1/b2 -p</span><br><span class="line">[cuser@f102 aa]$ rm -ir aa1</span><br><span class="line">rm：是否进入目录&quot;aa1&quot;? Y</span><br><span class="line">rm：是否进入目录&quot;aa1/b1&quot;? Y</span><br><span class="line">rm：是否删除目录 &quot;aa1/b1/b2&quot;？Y</span><br><span class="line">rm：是否删除目录 &quot;aa1/b1&quot;？Y</span><br><span class="line">rm：是否删除目录 &quot;aa1&quot;？Y                    提示确认删除的参数</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[cuser@f102 aa]$ cp f /tmp    将文件拷贝到tmp     ，可以拷贝多个，最后一个是文件夹</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 ~]# cp -r a1 aa1     将a1文件夹 拷贝到aa1 中</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">查看文件的类型：</span><br></pre></td></tr></table></figure>
+<h2 id="第四节"><a href="#第四节" class="headerlink" title="第四节"></a>第四节</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br></pre></td><td class="code"><pre><span class="line">find 查找文件命令</span><br><span class="line"></span><br><span class="line">--|find /dev -type d -print      将dev下面所有类型是文件夹的东西显示出来</span><br><span class="line">--|find /dev -type b -print      查找块设备文件</span><br><span class="line"></span><br><span class="line">--|find /etc -name &quot;passwd*&quot;        查找以passwd开头的文件</span><br><span class="line"></span><br><span class="line">--|find /etc -name &quot;passwd&quot; -exec ls -l &#123;&#125; \;        查找文件passwd开头的，以列表详细信息形式显示出来。</span><br><span class="line"></span><br><span class="line">--|find /etc -size +10000k -ok ls -l &#123;&#125; \;            查找大于1WK 的文件</span><br><span class="line"></span><br><span class="line">实例：</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 cuser]# find /etc -size +1000k -ok ls -l &#123;&#125; \;</span><br><span class="line">&lt; ls ... /etc/selinux/targeted/policy/policy.24 &gt; ? y</span><br><span class="line">-rw-r--r--. 1 root root 5820086  7月 14 2011 /etc/selinux/targeted/policy/policy.24</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">--|find /root -perm 644 -exec ls -l &#123;&#125; \;         按照用户的权限查找文件</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-rw-r--r--. 1 root root 129 12月  4 2004 /root/.tcsh</span><br><span class="line"></span><br><span class="line">解释：644</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">读写执行</span><br><span class="line"></span><br><span class="line">rw-   头三位，权限是110 。数字6</span><br><span class="line">有权限就是1 ，没有权限的就是0，每三位转换为二进制，</span><br><span class="line"></span><br><span class="line">r-- 代表4.。。。。。</span><br><span class="line"></span><br><span class="line">查询指定文件拥有者文件</span><br><span class="line"></span><br><span class="line">[root@f102 cuser]# find /home -user root              </span><br><span class="line">/home</span><br><span class="line">/home/cuser/100</span><br><span class="line">/home/cuser/a</span><br><span class="line">/home/cuser/a~</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 cuser]# find /home -user root -exec ls -l &#123;&#125; \;</span><br><span class="line">总用量 24</span><br><span class="line">drwx------. 34 cuser cuser 4096  5月 30 00:01 cuser</span><br><span class="line">drwx------.  4 stu1  users 4096 10月 12 2011 stu1</span><br><span class="line">drwx------.  4 stu11 stu11 4096 10月 19 2011 stu11</span><br><span class="line">drwx------.  4 stu12 stu12 4096 10月 19 2011 stu12</span><br><span class="line">drwx------. 27 stu13 stu13 4096 10月 19 2011 stu13</span><br><span class="line">drwx------.  4 stu14 stu14 4096 10月 19 2011 stu14</span><br><span class="line">-rw-r--r--. 1 root root 6 11月  2 2011 /home/cuser/100</span><br><span class="line">-rw-r--r--. 1 root root 37 10月 26 2011 /home/cuser/a</span><br><span class="line">-rw-r--r--. 1 root root 37 10月 26 2011 /home/cuser/a~</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">七天之内修改过的日志文件</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 cuser]# find /var/log -mtime 7 -exec ls -l &#123;&#125; \;</span><br><span class="line">七天之内没有修改过的日志文件</span><br><span class="line"></span><br><span class="line">[root@f102 cuser]# find /var/log -mtime +7 -exec ls -l &#123;&#125; \;</span><br><span class="line">总用量 4</span><br><span class="line">drwx------. 2 root root 4096  8月 24 2010 old</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">按照已知文件为标准，查找新的文件或者老的文件</span><br><span class="line">查找比1新的文件</span><br><span class="line"></span><br><span class="line">[root@f102 cuser]# find /home/cuser -newer /home/cuser/1</span><br><span class="line">/home/cuser</span><br><span class="line">/home/cuser/.xsession-errors</span><br><span class="line">/home/cuser/2</span><br><span class="line">/home/cuser/.local/share/gvfs-metadata</span><br><span class="line">/home/cuser/.local/share/gvfs-metadata/root-30cf838a.log</span><br><span class="line">/home/cuser/.local/share/gvfs-metadata/home-cedbf307.log</span><br><span class="line"></span><br><span class="line">查看分区情况  这些信息存在在 proc /partitons 下面</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 cuser]# fdisk -l</span><br><span class="line"></span><br><span class="line">Disk /dev/sda: 317.9 GB, 317891895808 bytes</span><br><span class="line">255 heads, 63 sectors/track, 38648 cylinders</span><br><span class="line">Units = cylinders of 16065 * 512 = 8225280 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br><span class="line">Disk identifier: 0xf0b1ebb0</span><br><span class="line"></span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">/dev/sda1   *        7770       11979    33816793+  83  Linux</span><br><span class="line">/dev/sda2           31675       35522    30909060    5  Extended</span><br><span class="line">/dev/sda5           31675       32209     4297356   82  Linux swap / Solaris</span><br><span class="line">/dev/sda6           32210       33483    10233373+   c  W95 FAT32 (LBA)</span><br><span class="line"></span><br><span class="line">63个扇区。38648</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sda</span><br><span class="line"></span><br><span class="line">sd 串口，a 第一个口。b 第二个口</span><br><span class="line"></span><br><span class="line">小于4的分区不可以让逻辑分区占用</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">分区调整</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 cuser]# fdisk -h</span><br><span class="line"></span><br><span class="line">Usage:</span><br><span class="line"> fdisk [options] &lt;disk&gt;    change partition table</span><br><span class="line"> fdisk [options] -l &lt;disk&gt; list partition table(s)</span><br><span class="line"> fdisk -s &lt;partition&gt;      give partition size(s) in blocks</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line"> -b &lt;size&gt;                 sector size (512, 1024, 2048 or 4096)</span><br><span class="line"> -c                        switch off DOS-compatible mode</span><br><span class="line"> -h                        print help</span><br><span class="line"> -u &lt;size&gt;                 give sizes in sectors instead of cylinders</span><br><span class="line"> -v                        print version</span><br><span class="line"> -C &lt;number&gt;               specify the number of cylinders</span><br><span class="line"> -H &lt;number&gt;               specify the number of heads</span><br><span class="line"> -S &lt;number&gt;               specify the number of sectors per track</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">挂载分区</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 cuser]# mount -t vfat /dev/sda6 /mnt/c </span><br><span class="line"></span><br><span class="line">编辑 /etc/fstab可以编辑挂在分区配置文件</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/dev/sda6		/mnt/c			vfat	defaults	0 0</span><br><span class="line">添加一行。可以在重启之后直接挂载上去</span><br></pre></td></tr></table></figure>
+<h2 id="第五节"><a href="#第五节" class="headerlink" title="第五节"></a>第五节</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br></pre></td><td class="code"><pre><span class="line">|ifconfig</span><br><span class="line"></span><br><span class="line">配置网络环境命令</span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# ifconfig</span><br><span class="line">eth1      Link encap:Ethernet  HWaddr 10:78:D2:93:C6:ED  </span><br><span class="line">          inet addr:192.168.31.177  Bcast:192.168.31.255  Mask:255.255.255.0</span><br><span class="line">          inet6 addr: fe80::1278:d2ff:fe93:c6ed/64 Scope:Link</span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1</span><br><span class="line">          RX packets:259983 errors:0 dropped:0 overruns:0 frame:0</span><br><span class="line">          TX packets:156970 errors:0 dropped:0 overruns:0 carrier:0</span><br><span class="line">          collisions:0 txqueuelen:100 </span><br><span class="line">          RX bytes:369104215 (352.0 MiB)  TX bytes:11998939 (11.4 MiB)</span><br><span class="line">          Memory:fbec0000-fbee0000 </span><br><span class="line"></span><br><span class="line">lo        Link encap:Local Loopback  </span><br><span class="line">          inet addr:127.0.0.1  Mask:255.0.0.0</span><br><span class="line">          inet6 addr: ::1/128 Scope:Host</span><br><span class="line">          UP LOOPBACK RUNNING  MTU:16436  Metric:1</span><br><span class="line">          RX packets:454 errors:0 dropped:0 overruns:0 frame:0</span><br><span class="line">          TX packets:454 errors:0 dropped:0 overruns:0 carrier:0</span><br><span class="line">          collisions:0 txqueuelen:0 </span><br><span class="line">          RX bytes:23140 (22.5 KiB)  TX bytes:23140 (22.5 KiB)</span><br><span class="line"></span><br><span class="line">virbr0    Link encap:Ethernet  HWaddr C6:2D:65:28:26:4A  </span><br><span class="line">          inet addr:192.168.122.1  Bcast:192.168.122.255  Mask:255.255.255.0</span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1</span><br><span class="line">          RX packets:0 errors:0 dropped:0 overruns:0 frame:0</span><br><span class="line">          TX packets:25 errors:0 dropped:0 overruns:0 carrier:0</span><br><span class="line">          collisions:0 txqueuelen:0 </span><br><span class="line">          RX bytes:0 (0.0 b)  TX bytes:4220 (4.1 KiB)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">|ifconfig</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# ifconfig eth1 192.168.31.111 netmask 255.255.255.0 up ^C</span><br><span class="line">设置一个IP以及子网眼吗，以及激活状态</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# ifconfig eth1</span><br><span class="line">查看是IP地址</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# hostname</span><br><span class="line">f102</span><br><span class="line">显示当前的主机名</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# hostname f111</span><br><span class="line">更改自己的主机名称</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">设置默认网关路由：</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# route add default gw 192.168.31.1</span><br><span class="line"></span><br><span class="line">更改DNS</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# gedit /etc/resolv.conf</span><br><span class="line">更改DNS的文件</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">格式：</span><br><span class="line"></span><br><span class="line">nameserver 8.8.8.8</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">查看软件是否安装：</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# rpm -qa |grep vsftp</span><br><span class="line">vsftpd-2.2.2-6.el6.i686</span><br><span class="line">查询软件vsftp</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">制作FTP服务器：</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# rpm -ivh ftp-0.17-51.1.el6.i686.rpm </span><br><span class="line">warning: ftp-0.17-51.1.el6.i686.rpm: Header V3 RSA/SHA256 Signature, key ID fd431d51: NOKEY</span><br><span class="line">Preparing...                ########################################### [100%]</span><br><span class="line">   1:ftp                    ########################################### [100%]</span><br><span class="line">安装rpm软件包</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">查看服务运行状态</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# service vsftpd status</span><br><span class="line">vsftpd 已停</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">重启服务：</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# /etc/init.d/vsftpd restart</span><br><span class="line">关闭 vsftpd：                                              [确定]</span><br><span class="line">为 vsftpd 启动 vsftpd：                                    [确定]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">关闭服务：</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# service vsftpd stop</span><br><span class="line">关闭 vsftpd：                                              [确定]</span><br><span class="line"></span><br><span class="line">开启服务：</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f102 桌面]# service vsftpd start</span><br><span class="line">为 vsftpd 启动 vsftpd：                                    [确定]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">设置开机启动的服务</span><br><span class="line"></span><br><span class="line">ntsysv </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ftp使用</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f111 桌面]# ftp localhost</span><br><span class="line">Connected to localhost (127.0.0.1).</span><br><span class="line">220 (vsFTPd 2.2.2)</span><br><span class="line">Name (localhost:root): anonymous</span><br><span class="line">331 Please specify the password.</span><br><span class="line">Password:</span><br><span class="line">230 Login successful.</span><br><span class="line">Remote system type is UNIX.</span><br><span class="line">Using binary mode to transfer files.</span><br><span class="line">ftp&gt; ls</span><br><span class="line">227 Entering Passive Mode (127,0,0,1,159,114).</span><br><span class="line">150 Here comes the directory listing.</span><br><span class="line">-rw-r--r--    1 0        0               0 Jun 05 17:15 123</span><br><span class="line">drwxr-xr-x    2 0        0            4096 May 26  2010 pub</span><br><span class="line">226 Directory send OK.</span><br><span class="line">ftp&gt; get 123</span><br><span class="line">local: 123 remote: 123</span><br><span class="line">227 Entering Passive Mode (127,0,0,1,81,102).</span><br><span class="line">150 Opening BINARY mode data connection for 123 (0 bytes).</span><br><span class="line">226 Transfer complete.</span><br><span class="line">登录本地FTP</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">使用匿名用户登录</span><br><span class="line"></span><br><span class="line">查看所有的文件</span><br><span class="line"></span><br><span class="line">下载文件123</span><br><span class="line"></span><br><span class="line">下载到了桌面上</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">bye推出ftp服务器登录状态</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">更改ftp文件配置</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@f111 桌面]# gedit /etc/vsftpd/vsftpd.conf</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/05/02/李兴华jsp教程-使用过滤器之后-出现打不开页面的问题/" rel="next" title="李兴华Jsp教程-使用过滤器之后,出现打不开页面的问题">
+                <i class="fa fa-chevron-left"></i> 李兴华Jsp教程-使用过滤器之后,出现打不开页面的问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/05/15/WIN8系统按下ctrl按键直接关闭文件夹并结束explorer进程解决方案/" rel="prev" title="WIN8系统按下ctrl按键直接关闭文件夹并结束explorer进程解决方案">
+                WIN8系统按下ctrl按键直接关闭文件夹并结束explorer进程解决方案 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/avatar.jpg" alt="Keen">
+            
+              <p class="site-author-name" itemprop="name">Keen</p>
+              <p class="site-description motion-element" itemprop="description">大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/zkeenly" title="GitHub &rarr; https://github.com/zkeenly" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" title="QQ &rarr; tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>QQ</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://www.douban.com/people/mggige/" title="DouBan &rarr; https://www.douban.com/people/mggige/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>DouBan</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhangkaixu321@163.com" title="Email &rarr; mailto:zhangkaixu321@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>Email</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#第一节"><span class="nav-number">1.</span> <span class="nav-text">第一节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二节"><span class="nav-number">2.</span> <span class="nav-text">第二节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第三节"><span class="nav-number">3.</span> <span class="nav-text">第三节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第四节"><span class="nav-number">4.</span> <span class="nav-text">第四节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第五节"><span class="nav-number">5.</span> <span class="nav-text">第五节</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Keen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'SkWT2NNHPIBHPvGC3XIpFRUk-gzGzoHsz',
+        appKey: 'tiTu7SX6GOrlxzeyWyKVGtNG',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: false
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

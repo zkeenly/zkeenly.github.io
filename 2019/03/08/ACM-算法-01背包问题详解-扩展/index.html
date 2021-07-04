@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="01背包问题作为著名的动态规划问题之一，在算法学习中的意义不言而喻。 最近刷到一道题，在01背包问题中有稍微改变。  题中不仅要求输出最大概率之和，还要求输出楼盘ID。 动态规划问题例如输入序列为：  5 102 0.23 0.34 0.445 0.556 0.6  贪心算法：第一种解法是贪心算法  将所有楼盘序列计算出单位概率。 按照单位概率将序列排序。 依次从高概率遍历到低概率，从而得到局部最">
+<meta name="keywords" content="算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[ACM&#x2F;算法]01背包问题详解+扩展">
+<meta property="og:url" content="https://zkeenly.github.io/2019/03/08/ACM-算法-01背包问题详解-扩展/index.html">
+<meta property="og:site_name" content="Keen&#39;s blog">
+<meta property="og:description" content="01背包问题作为著名的动态规划问题之一，在算法学习中的意义不言而喻。 最近刷到一道题，在01背包问题中有稍微改变。  题中不仅要求输出最大概率之和，还要求输出楼盘ID。 动态规划问题例如输入序列为：  5 102 0.23 0.34 0.445 0.556 0.6  贪心算法：第一种解法是贪心算法  将所有楼盘序列计算出单位概率。 按照单位概率将序列排序。 依次从高概率遍历到低概率，从而得到局部最">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://www.zkeenly.com/images/2019-03-08-1.png">
+<meta property="og:image" content="https://www.zkeenly.com/images/2019-03-08-2.png">
+<meta property="og:image" content="https://www.zkeenly.com/images/2019-03-08-3.png">
+<meta property="og:updated_time" content="2019-03-09T07:27:25.078Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[ACM&#x2F;算法]01背包问题详解+扩展">
+<meta name="twitter:description" content="01背包问题作为著名的动态规划问题之一，在算法学习中的意义不言而喻。 最近刷到一道题，在01背包问题中有稍微改变。  题中不仅要求输出最大概率之和，还要求输出楼盘ID。 动态规划问题例如输入序列为：  5 102 0.23 0.34 0.445 0.556 0.6  贪心算法：第一种解法是贪心算法  将所有楼盘序列计算出单位概率。 按照单位概率将序列排序。 依次从高概率遍历到低概率，从而得到局部最">
+<meta name="twitter:image" content="https://www.zkeenly.com/images/2019-03-08-1.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Keen's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://zkeenly.github.io/2019/03/08/ACM-算法-01背包问题详解-扩展/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>[ACM/算法]01背包问题详解+扩展 | Keen's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Keen's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zkeenly.github.io/2019/03/08/ACM-算法-01背包问题详解-扩展/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Keen">
+      <meta itemprop="description" content="大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Keen's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">[ACM/算法]01背包问题详解+扩展
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-03-08 15:51:01" itemprop="dateCreated datePublished" datetime="2019-03-08T15:51:01+08:00">2019-03-08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-03-09 15:27:25" itemprop="dateModified" datetime="2019-03-09T15:27:25+08:00">2019-03-09</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/ACM-算法/" itemprop="url" rel="index"><span itemprop="name">ACM/算法</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/03/08/ACM-算法-01背包问题详解-扩展/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count valine-comment-count" data-xid="/2019/03/08/ACM-算法-01背包问题详解-扩展/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>01背包问题作为著名的动态规划问题之一，在算法学习中的意义不言而喻。</p>
+<p>最近刷到一道题，在01背包问题中有稍微改变。</p>
+<p><img src="https://www.zkeenly.com/images/2019-03-08-1.png" alt="BeiBaoQuestion"></p>
+<p>题中不仅要求输出最大概率之和，还要求输出楼盘ID。</p>
+<h3 id="动态规划问题"><a href="#动态规划问题" class="headerlink" title="动态规划问题"></a>动态规划问题</h3><p>例如输入序列为：</p>
+<blockquote>
+<p>5 10<br>2 0.2<br>3 0.3<br>4 0.44<br>5 0.55<br>6 0.6</p>
+</blockquote>
+<h4 id="贪心算法："><a href="#贪心算法：" class="headerlink" title="贪心算法："></a>贪心算法：</h4><p>第一种解法是贪心算法</p>
+<ol>
+<li>将所有楼盘序列计算出单位概率。</li>
+<li>按照单位概率将序列排序。</li>
+<li>依次从高概率遍历到低概率，从而得到局部最优解。</li>
+</ol>
+<p>算法代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">greedy</span><span class="params">()</span>:</span></span><br><span class="line">    number, fund = input().split(<span class="string">' '</span>)</span><br><span class="line">    fund = int(fund)</span><br><span class="line">    array = []</span><br><span class="line">    max_prob = []</span><br><span class="line">    max_value = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(int(number)):  <span class="comment"># 输入锁定金额和概率</span></span><br><span class="line">        value, prob = input().split(<span class="string">' '</span>)</span><br><span class="line">        current_id = i+<span class="number">1</span></span><br><span class="line">        array.append([current_id, int(value), float(prob), float(prob)/float(value)])</span><br><span class="line">    print(array)</span><br><span class="line">    <span class="comment"># 第四位排序</span></span><br><span class="line">    array.sort(key=take_four, reverse=<span class="keyword">True</span>)</span><br><span class="line">    print(array)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> array:  <span class="comment"># 选中最佳可能的资金</span></span><br><span class="line">        max_value += i[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">if</span> max_value &lt; fund:</span><br><span class="line">            max_prob.append([i[<span class="number">0</span>], i[<span class="number">2</span>]])</span><br><span class="line">    print(<span class="string">'max_prob:'</span>, max_prob)</span><br><span class="line">    max_prob_value = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> max_prob:</span><br><span class="line">        max_prob_value = i[<span class="number">1</span>] + max_prob_value</span><br><span class="line">    print(max_prob_value, [x[<span class="number">0</span>] <span class="keyword">for</span> x <span class="keyword">in</span> max_prob])</span><br></pre></td></tr></table></figure>
+<p>我们可以得到结果</p>
+<p><code>0.99 [4, 3]</code></p>
+<p>显然这不是我们想要的结果，因为最优解应该为1，2，4 = 1.05才对。</p>
+<h4 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h4><h5 id="寻找最大概率值"><a href="#寻找最大概率值" class="headerlink" title="寻找最大概率值"></a>寻找最大概率值</h5><p>使用动态规划的方法解决该问题需要对问题建立转移方程：</p>
+<ol>
+<li><p>输入楼盘数量为number，总资金为fund</p>
+</li>
+<li><p>输入楼盘的数据raw_data.</p>
+</li>
+<li><p>定义子问题P(i, v)为在前i个楼盘中挑选总价值不超过v的楼盘，并且每个楼盘只能选择一次，使得最终抽中的总概率最大。我们此时的最优解记作max_prob(i, w)，其中1&lt;=i&lt;=number,1&lt;=w&lt;=fund。</p>
+</li>
+<li><p>当我们考虑第i个楼盘的时候：</p>
+<p>如果不选择，则总资金容量不变，改为问题P(i-1, w)</p>
+<p>如果选择这个楼盘，则总资金剩余容量变小，改问题为P(i-1, w-wi)</p>
+</li>
+<li><p>最优解的问题就是比较3中两个方案哪一个是最佳的：</p>
+<p>max_prob(i,w) = max{max_prob(i-1,w),max_prob(i-1,w-wi)+valuei}</p>
+</li>
+</ol>
+<p>例如输入序列为：</p>
+<blockquote>
+<p>5 10<br>2 0.2<br>3 0.3<br>4 0.44<br>5 0.55<br>6 0.6</p>
+</blockquote>
+<blockquote>
+<p>假设我们一共有10W金钱，楼盘价值分别为2，3，4，5，6。楼盘概率分别为0.2，0.3，0.44，0.55，0.6。</p>
+</blockquote>
+<p>那么我们通过转移方程可以推算出以下表格max_prob：</p>
+<p><img src="https://www.zkeenly.com/images/2019-03-08-2.png" alt="1552028354656"></p>
+<p>推算过程:</p>
+<ol>
+<li><p>建立一个表格，大小为number×fund。</p>
+</li>
+<li><p>逐层遍历，按列遍历。</p>
+<ol>
+<li><p>当资金为1的时候，没有任何房产可以购买。</p>
+</li>
+<li><p>当资金为2的时候，可以购买房产1。</p>
+</li>
+<li><p>当资金为3的时候，可以购买房产1，但是当遍历到（2，3）的时候，对比</p>
+<p>max{max_prob(i-1,w),max_prob(i-1,w-wi)+valuei}</p>
+<p>其中max_prob(i-1,w) 代表i-1行w列。</p>
+<p>其中max_prob(i-1,w)为0.2，max_prob(i-1,w-wi)+valuei 为0.2-0.2 + 0.3 = 0.3</p>
+</li>
+<li><p>经过逐次的遍历，得到最终整个矩阵数据。</p>
+</li>
+</ol>
+</li>
+</ol>
+<p>算法代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dynasty</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># ----------------输入数据----------------------</span></span><br><span class="line">    number, fund = input().split(<span class="string">' '</span>)</span><br><span class="line">    fund = int(fund)</span><br><span class="line">    number = int(number)</span><br><span class="line">    max_prob = [[<span class="number">0</span> <span class="keyword">for</span> col <span class="keyword">in</span> range(fund+<span class="number">1</span>)] <span class="keyword">for</span> row <span class="keyword">in</span> range(number+<span class="number">1</span>)]</span><br><span class="line">    raw_data = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(int(number)):  <span class="comment"># 输入锁定金额和概率</span></span><br><span class="line">        value, prob = input().split(<span class="string">' '</span>)</span><br><span class="line">        current_id = i+<span class="number">1</span></span><br><span class="line">        raw_data.append([current_id, int(value), float(prob), float(prob)/float(value)])</span><br><span class="line">    <span class="comment"># ---------------计算概率分布矩阵-------------------</span></span><br><span class="line">    all_max = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, number+<span class="number">1</span>):  <span class="comment"># 遍历所有的房价,number为房产个数</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">1</span>, fund+<span class="number">1</span>):  <span class="comment"># 遍历所有总金额,</span></span><br><span class="line">            <span class="comment"># print(i, j, raw_data[i-1][1])</span></span><br><span class="line">            <span class="keyword">if</span> j &lt; raw_data[i<span class="number">-1</span>][<span class="number">1</span>]:  <span class="comment"># 假定的总金额小于当前房产的价格</span></span><br><span class="line">                max_prob[i][j] = max_prob[i<span class="number">-1</span>][j]  <span class="comment"># 概率等于之前的</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                max_prob[i][j] = max(max_prob[i<span class="number">-1</span>][j], (max_prob[i<span class="number">-1</span>][j-raw_data[i<span class="number">-1</span>][<span class="number">1</span>]] + raw_data[i<span class="number">-1</span>][<span class="number">2</span>]))</span><br><span class="line">                <span class="keyword">if</span> max_prob[i][j] &gt; all_max:  <span class="comment"># 记录概率最大值</span></span><br><span class="line">                    all_max = max_prob[i][j]</span><br><span class="line">   </span><br><span class="line">	<span class="comment"># ----------------打印概率分布矩阵---------------</span></span><br><span class="line">    print(<span class="string">'概率分布矩阵:\n'</span>, max_prob)</span><br><span class="line">    print(<span class="string">'all_max_prob:'</span>, all_max)</span><br></pre></td></tr></table></figure>
+<h5 id="计算楼盘的序列"><a href="#计算楼盘的序列" class="headerlink" title="计算楼盘的序列"></a>计算楼盘的序列</h5><ol>
+<li><p>定义指针（i,j）倒序遍历表格</p>
+</li>
+<li><p>从末尾开始遍历,寻找按顺序排列第一次出现<code>all_max</code>节点,将<code>all_max</code>修改为<code>all_max-raw_data[i][prob]</code></p>
+</li>
+<li><p>当找到第一个星号1.05后移动指针位置到（i-1,j-1）,检测当前值是否为第一次出现的<code>all_max</code>,如果是，标记为星，并重复2步骤，直到遍历到（0，0）</p>
+</li>
+<li><p>输出所有标记星所在的行即为楼盘序列。</p>
+<p><img src="https://www.zkeenly.com/images/2019-03-08-3.png" alt="1552030438642"></p>
+</li>
+</ol>
+<p>算法代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ----------------从表中推出楼盘列表--------------</span></span><br><span class="line">id_list = []</span><br><span class="line"><span class="comment"># id_list.append(max_id)</span></span><br><span class="line"><span class="comment"># 反向查找关键节点</span></span><br><span class="line">j = fund  <span class="comment"># 定义列位置</span></span><br><span class="line">i = number  <span class="comment"># 定义行位置</span></span><br><span class="line"><span class="keyword">while</span> i != <span class="number">0</span> <span class="keyword">and</span> j != <span class="number">0</span>:  <span class="comment"># 从max_prob表右下位置开始，逆序遍历</span></span><br><span class="line">    <span class="comment"># print('all_max:', all_max)</span></span><br><span class="line">    print(<span class="string">'当前遍历的节点i,j,prob:'</span>, i, j, max_prob[i][j])</span><br><span class="line">    <span class="comment"># print('value:', int(max_prob[i][j]))</span></span><br><span class="line">    <span class="comment"># print('value_(i,j-1):', int(max_prob[i][j-1]))</span></span><br><span class="line">    <span class="comment"># 如果同行上一列的的概率值仍然为最大，则切换到上一列</span></span><br><span class="line">    <span class="keyword">if</span> max_prob[i][j<span class="number">-1</span>] == all_max:</span><br><span class="line">        <span class="comment"># print('j = j-1')</span></span><br><span class="line">        j = j<span class="number">-1</span></span><br><span class="line">    <span class="comment"># 如果同列上一行的的概率值仍然为最大，则切换到上一行</span></span><br><span class="line">    <span class="keyword">elif</span> max_prob[i - <span class="number">1</span>][j] == all_max:</span><br><span class="line">        <span class="comment"># print('i = i-1')</span></span><br><span class="line">        i = i<span class="number">-1</span></span><br><span class="line">    <span class="comment"># 处于拐点，可能是一个关键点。</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="comment"># print('test', int(max_prob[i][j]), int(all_max - raw_data[i-1][2]))</span></span><br><span class="line">        <span class="comment"># 如果当前概率等于最大的概率，则是关键点</span></span><br><span class="line">        <span class="keyword">if</span> max_prob[i][j] == all_max:</span><br><span class="line">            id_list.append(raw_data[i<span class="number">-1</span>][<span class="number">0</span>])  <span class="comment"># 保存当前楼盘的id</span></span><br><span class="line">            all_max = all_max - raw_data[i<span class="number">-1</span>][<span class="number">2</span>]  <span class="comment"># 转换当前最大概率，寻找下一个关键节点</span></span><br><span class="line">            print(<span class="string">'----当前楼盘是关键点之一：'</span>, i, <span class="string">'下一个节点prob为：'</span>, all_max)</span><br><span class="line">        i = i<span class="number">-1</span></span><br><span class="line">        j = j<span class="number">-1</span></span><br><span class="line">print(id_list)</span><br></pre></td></tr></table></figure>
+<p>算法源码点击 <a href="https://github.com/zkeenly/articles/blob/master/KnapsackProblem.py" target="_blank" rel="noopener">这里</a></p>
+<p>引用：</p>
+<p><a href="https://blog.csdn.net/huanghaocs/article/details/77920358" target="_blank" rel="noopener">https://blog.csdn.net/huanghaocs/article/details/77920358</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/30959069" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/30959069</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/24/论如何玩好QQ游戏-打手掌/" rel="next" title="论如何玩好QQ游戏-打手掌">
+                <i class="fa fa-chevron-left"></i> 论如何玩好QQ游戏-打手掌
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/09/ACM-算法-硬币问题/" rel="prev" title="[ACM/算法]算法硬币问题">
+                [ACM/算法]算法硬币问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/avatar.jpg" alt="Keen">
+            
+              <p class="site-author-name" itemprop="name">Keen</p>
+              <p class="site-description motion-element" itemprop="description">大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/zkeenly" title="GitHub &rarr; https://github.com/zkeenly" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" title="QQ &rarr; tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>QQ</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://www.douban.com/people/mggige/" title="DouBan &rarr; https://www.douban.com/people/mggige/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>DouBan</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhangkaixu321@163.com" title="Email &rarr; mailto:zhangkaixu321@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>Email</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态规划问题"><span class="nav-number">1.</span> <span class="nav-text">动态规划问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#贪心算法："><span class="nav-number">1.1.</span> <span class="nav-text">贪心算法：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#动态规划"><span class="nav-number">1.2.</span> <span class="nav-text">动态规划</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#寻找最大概率值"><span class="nav-number">1.2.1.</span> <span class="nav-text">寻找最大概率值</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#计算楼盘的序列"><span class="nav-number">1.2.2.</span> <span class="nav-text">计算楼盘的序列</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Keen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'SkWT2NNHPIBHPvGC3XIpFRUk-gzGzoHsz',
+        appKey: 'tiTu7SX6GOrlxzeyWyKVGtNG',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: false
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

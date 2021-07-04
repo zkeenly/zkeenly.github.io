@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="代码：code本文采取sony拍摄的arw格式图像测试，测试图像在论文中下载： bayer图像格式由于人眼对GREEN颜色的感知更为强烈，所以一般raw 格式的图像每个2*2矩阵中，都有两个G分量，一个R以及一个B分量，G分量的排列方式可以有所不同，如下图： 对于转换为RGB格式，一般采取插值的方法，将原始图像中的R/G/B三个分量，插值到附近，分别产生新的三个矩阵，分别为R,G,B。以下为代码，">
+<meta name="keywords" content="图像处理,python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BayerRaw与RGB的转换">
+<meta property="og:url" content="https://zkeenly.github.io/2018/11/18/BayerRaw与RGB的转换/index.html">
+<meta property="og:site_name" content="Keen&#39;s blog">
+<meta property="og:description" content="代码：code本文采取sony拍摄的arw格式图像测试，测试图像在论文中下载： bayer图像格式由于人眼对GREEN颜色的感知更为强烈，所以一般raw 格式的图像每个2*2矩阵中，都有两个G分量，一个R以及一个B分量，G分量的排列方式可以有所不同，如下图： 对于转换为RGB格式，一般采取插值的方法，将原始图像中的R/G/B三个分量，插值到附近，分别产生新的三个矩阵，分别为R,G,B。以下为代码，">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952226-e8512f80-dfa6-11e8-8a7a-facbd94c30e6.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952815-36b6fc00-dfb0-11e8-999f-519c9f004b59.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952791-db850980-dfaf-11e8-847b-0751b4fb98b8.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952218-c0fa6280-dfa6-11e8-9ce1-1feb84a3008f.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952892-f0ae6800-dfb0-11e8-9bbb-51b472db5740.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952822-4a626280-dfb0-11e8-8d16-fcea9ab15813.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952873-d07ea900-dfb0-11e8-9cd6-406e80d583b0.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952832-6f56d580-dfb0-11e8-9277-4f973f0e8fb8.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952898-00c64780-dfb1-11e8-974c-28adb36d771e.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952854-990ffc80-dfb0-11e8-9c54-83e15026a3e5.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952903-0f146380-dfb1-11e8-82b4-4ef52cd2c49e.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47952865-c0ff6000-dfb0-11e8-98dd-013d85bb501a.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/6647857/47953171-c9599a00-dfb4-11e8-8c12-5343fff0d97f.png">
+<meta property="og:updated_time" content="2018-12-09T07:05:42.809Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BayerRaw与RGB的转换">
+<meta name="twitter:description" content="代码：code本文采取sony拍摄的arw格式图像测试，测试图像在论文中下载： bayer图像格式由于人眼对GREEN颜色的感知更为强烈，所以一般raw 格式的图像每个2*2矩阵中，都有两个G分量，一个R以及一个B分量，G分量的排列方式可以有所不同，如下图： 对于转换为RGB格式，一般采取插值的方法，将原始图像中的R/G/B三个分量，插值到附近，分别产生新的三个矩阵，分别为R,G,B。以下为代码，">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/6647857/47952226-e8512f80-dfa6-11e8-8a7a-facbd94c30e6.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Keen's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://zkeenly.github.io/2018/11/18/BayerRaw与RGB的转换/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>BayerRaw与RGB的转换 | Keen's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Keen's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zkeenly.github.io/2018/11/18/BayerRaw与RGB的转换/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Keen">
+      <meta itemprop="description" content="大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Keen's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">BayerRaw与RGB的转换
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-11-18 14:20:24" itemprop="dateCreated datePublished" datetime="2018-11-18T14:20:24+08:00">2018-11-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-12-09 15:05:42" itemprop="dateModified" datetime="2018-12-09T15:05:42+08:00">2018-12-09</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/图像处理/" itemprop="url" rel="index"><span itemprop="name">图像处理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/11/18/BayerRaw与RGB的转换/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">Comments: </span> <span class="post-comments-count valine-comment-count" data-xid="/2018/11/18/BayerRaw与RGB的转换/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>代码：<a href="https://github.com/zkeenly/articles/blob/master/RAW2RGB.py" target="_blank" rel="noopener">code</a><br>本文采取sony拍摄的arw格式图像测试，测试图像在<a href="https://github.com/cchen156/Learning-to-See-in-the-Dark" target="_blank" rel="noopener">论文</a>中下载：</p>
+<p>bayer图像格式<br><img src="https://user-images.githubusercontent.com/6647857/47952226-e8512f80-dfa6-11e8-8a7a-facbd94c30e6.png" alt="image"><br>由于人眼对GREEN颜色的感知更为强烈，所以一般raw 格式的图像每个2*2矩阵中，都有两个G分量，一个R以及一个B分量，G分量的排列方式可以有所不同，如下图：<br><img width="302" alt="image" src="https://user-images.githubusercontent.com/6647857/47952815-36b6fc00-dfb0-11e8-999f-519c9f004b59.png"></p>
+<p>对于转换为RGB格式，一般采取插值的方法，将原始图像中的R/G/B三个分量，插值到附近，分别产生新的三个矩阵，分别为R,G,B。<br><img width="117" alt="image" src="https://user-images.githubusercontent.com/6647857/47952791-db850980-dfaf-11e8-847b-0751b4fb98b8.png"><br>以下为代码，对于两个G分量采用均值方法优化插值：</p>
+<p><img width="423" alt="image" src="https://user-images.githubusercontent.com/6647857/47952218-c0fa6280-dfa6-11e8-9ce1-1feb84a3008f.png"></p>
+<p>1-自己写的函数最终得到图像结果：<br>放大：<br><img width="600" alt="image" src="https://user-images.githubusercontent.com/6647857/47952892-f0ae6800-dfb0-11e8-9bbb-51b472db5740.png"><br>原图：<br><img width="600" alt="image" src="https://user-images.githubusercontent.com/6647857/47952822-4a626280-dfb0-11e8-8d16-fcea9ab15813.png"></p>
+<p>2-使用sony插件直接查看arw图像的结果：<br>放大：<br><img width="600" alt="image" src="https://user-images.githubusercontent.com/6647857/47952873-d07ea900-dfb0-11e8-9cd6-406e80d583b0.png"><br>原图：<br><img width="600" alt="image" src="https://user-images.githubusercontent.com/6647857/47952832-6f56d580-dfb0-11e8-9277-4f973f0e8fb8.png"></p>
+<p>3-使用python rawpy库函数的postprocess 方法默认参数处理：<br>放大：<br><img width="600" alt="image" src="https://user-images.githubusercontent.com/6647857/47952898-00c64780-dfb1-11e8-974c-28adb36d771e.png"><br>原图：<br><img width="600" alt="image" src="https://user-images.githubusercontent.com/6647857/47952854-990ffc80-dfb0-11e8-9c54-83e15026a3e5.png"></p>
+<p>4-使用learning to see in dark 中的postprocess 方法所设置的参数处理：<br>rgb = raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)<br>放大：<br><img width="600" alt="image" src="https://user-images.githubusercontent.com/6647857/47952903-0f146380-dfb1-11e8-82b4-4ef52cd2c49e.png"><br>原图：<br><img width="600" alt="image" src="https://user-images.githubusercontent.com/6647857/47952865-c0ff6000-dfb0-11e8-98dd-013d85bb501a.png"></p>
+<p>最终分析结果：<br>再亮度上：<br>2&gt;3&gt;4&gt;1</p>
+<p>在视觉效果上：<br>4&gt;2&gt;3&gt;1<br>在清晰度上：<br>4=3&gt;2=1<br>在还原RGB方面，使用参数调节后的rawpy.postprocess方法（use_camera_wb）更好。<br>造成以上差异的主要因素还是插值方法的不同：<br>在文章HIGH-QUALITY LINEAR INTERPOLATION FOR DEMOSAICING OF BAYER-PATTERNED COLOR IMAGES 中介绍了更好的插值方法：<br><img width="357" alt="image" src="https://user-images.githubusercontent.com/6647857/47953171-c9599a00-dfb4-11e8-8c12-5343fff0d97f.png"></p>
+<p>引用：<br><a href="https://letmaik.github.io/rawpy/api/rawpy.Params.html" target="_blank" rel="noopener">https://letmaik.github.io/rawpy/api/rawpy.Params.html</a><br><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/Demosaicing_ICASSP04.pdf" target="_blank" rel="noopener">https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/Demosaicing_ICASSP04.pdf</a><br><a href="http://www.imatest.com/docs/raw/" target="_blank" rel="noopener">http://www.imatest.com/docs/raw/</a><br><a href="http://blog.sina.com.cn/s/blog_ebbe6d790101e56e.html" target="_blank" rel="noopener">http://blog.sina.com.cn/s/blog_ebbe6d790101e56e.html</a><br><a href="https://blog.csdn.net/peng864534630/article/details/78177211" target="_blank" rel="noopener">https://blog.csdn.net/peng864534630/article/details/78177211</a><br><a href="https://www.cnblogs.com/zhongguo135/p/7755287.html" target="_blank" rel="noopener">https://www.cnblogs.com/zhongguo135/p/7755287.html</a><br>Learning-to-see-in-draking</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/图像处理/" rel="tag"># 图像处理</a>
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/18/Tensorflow中slice与cancat的使用/" rel="next" title="Tensorflow中slice与cancat的使用">
+                <i class="fa fa-chevron-left"></i> Tensorflow中slice与cancat的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/08/tensorboard监控slim网络中间层输出/" rel="prev" title="Tensorboard监控slim网络中间层输出">
+                Tensorboard监控slim网络中间层输出 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/avatar.jpg" alt="Keen">
+            
+              <p class="site-author-name" itemprop="name">Keen</p>
+              <p class="site-description motion-element" itemprop="description">大家好, 我是一个随便记录一下什么的blog. 主人就读于CCNU, postgraduate. 研究领域:图像处理, 计算机视觉, 机器学习.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/zkeenly" title="GitHub &rarr; https://github.com/zkeenly" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" title="QQ &rarr; tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=772714161&website=www.oicqzone.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>QQ</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://www.douban.com/people/mggige/" title="DouBan &rarr; https://www.douban.com/people/mggige/" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>DouBan</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhangkaixu321@163.com" title="Email &rarr; mailto:zhangkaixu321@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>Email</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Keen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'SkWT2NNHPIBHPvGC3XIpFRUk-gzGzoHsz',
+        appKey: 'tiTu7SX6GOrlxzeyWyKVGtNG',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: false
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
